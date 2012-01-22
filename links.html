@@ -4,7 +4,11 @@
 	body {
 		margin: 0;
 		cursor: crosshair;
+	}
+	#background {
+		width: 768px; height: 1024px;
 		background-repeat: no-repeat;
+		background-image: url(file:///Users/nic/Desktop/links/screen.png);
 	}
 	div.link {
 		position: absolute;
@@ -17,14 +21,12 @@
 </style>
 
 <head><title>Linker</title></head>
-<body></body>
+<body><div id="background"></div></body>
 
 <script type="text/javascript" charset="utf-8">
 
 	window.moveTo(0, 0);
 	window.resizeTo( 768, window.screen.availHeight );
-
-	$('body').css( 'background-image', 'url(file:///Users/nic/Desktop/links/screen.png)' );
 
 	links_window = window.open(
 		'blank.html', 'links_window',
@@ -35,27 +37,9 @@
 
 	var currentX = -1;
 	var currentY = -1;
-	var Y_offset = 0;
-	var dragging = 0;
-	var page_drag_start_Y = 0;
 	var n_links = 0;
 
 	$('body').click( function (e) {
-		if ( e.shiftKey ) {
-			page_drag_start_Y = e.pageY - Y_offset;
-			dragging = 1;
-			$('body').css( 'cursor', 'move' );
-			$('body').on( 'mousemove', function (e) {
-		    Y_offset = e.pageY - page_drag_start_Y;
-				$('body').css( 'background-position', '0 ' + Y_offset );
-				e.stopImmediatePropagation();
-			} ).one( 'click', function () {
-				$('body').css( 'cursor', 'crosshair' ).off( 'mousemove mouseup' );
-				dragging = 0;
-			} );
-			return false;
-		}
-		if ( dragging ) return false;
 		if ( currentX > 0 ) {
 			$(this).append( $('<div id="link-' + ++n_links + '" class="link"></div>') );
 			var dims = '{{' + currentX + ',' + currentY + '},{' + e.pageX + ',' + e.pageY + '}}';
