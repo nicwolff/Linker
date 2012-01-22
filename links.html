@@ -26,13 +26,13 @@
 <script type="text/javascript" charset="utf-8">
 
 	window.moveTo(0, 0);
-	window.resizeTo( 768, window.screen.availHeight );
+	window.resizeTo( 768 + 15, window.screen.availHeight );
 
 	links_window = window.open(
 		'blank.html', 'links_window',
 		'location=0,status=0,scrollbars=0,width=400,height=600'
 	);
-  links_window.moveTo(769, 0);
+  links_window.moveTo(769 + 15, 0);
 	self.focus();
 
 	var currentX = -1;
@@ -51,7 +51,7 @@
 				} )
 				.append(dims);
 			$(links_window.document.getElementById('links'))
-				.append('<div id="link-' + n_links + '">' + dims + '</div>');
+				.append('<div contentEditable="true" id="link-' + n_links + '">' + dims + '</div>');
 			currentX = currentY = -1;
 		} else {
 			currentX = e.pageX;
