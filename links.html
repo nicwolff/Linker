@@ -1,0 +1,85 @@
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+<style type="text/css" media="screen">
+	body {
+		margin: 0;
+		cursor: crosshair;
+		background-repeat: no-repeat;
+	}
+	div.link {
+		position: absolute;
+		background-color: white; opacity: .5;
+		width: 200px; height: 100px;
+		border: 1px solid red;
+		font-family: Verdana;
+		font-size: 8px;
+	}
+</style>
+
+<head><title>Linker</title></head>
+<body></body>
+
+<script type="text/javascript" charset="utf-8">
+
+	window.moveTo(0, 0);
+	window.resizeTo( 768, window.screen.availHeight );
+
+	$('body').css( 'background-image', 'url(file:///Users/nic/Desktop/links/screen.png)' );
+
+	links_window = window.open(
+		'blank.html', 'links_window',
+		'location=0,status=0,scrollbars=0,width=400,height=600'
+	);
+  links_window.moveTo(769, 0);
+	self.focus();
+
+	var currentX = -1;
+	var currentY = -1;
+	var Y_offset = 0;
+	var dragging = 0;
+	var page_drag_start_Y = 0;
+	var n_links = 0;
+
+	$('body').click( function (e) {
+		if ( e.shiftKey ) {
+			page_drag_start_Y = e.pageY - Y_offset;
+			dragging = 1;
+			$('body').css( 'cursor', 'move' );
+			$('body').on( 'mousemove', function (e) {
+		    Y_offset = e.pageY - page_drag_start_Y;
+				$('body').css( 'background-position', '0 ' + Y_offset );
+				e.stopImmediatePropagation();
+			} ).one( 'click', function () {
+				$('body').css( 'cursor', 'crosshair' ).off( 'mousemove mouseup' );
+				dragging = 0;
+			} );
+			return false;
+		}
+		if ( dragging ) return false;
+		if ( currentX > 0 ) {
+			$(this).append( $('<div id="link-' + ++n_links + '" class="link"></div>') );
+			var dims = '{{' + currentX + ',' + currentY + '},{' + e.pageX + ',' + e.pageY + '}}';
+			$('#link-' + n_links)
+				.css( {
+					left: currentX, top: currentY,
+					width: e.pageX - currentX,
+					height: e.pageY - currentY
+				} )
+				.append(dims);
+			$(links_window.document.getElementById('links'))
+				.append('<div id="link-' + n_links + '">' + dims + '</div>');
+			currentX = currentY = -1;
+		} else {
+			currentX = e.pageX;
+			currentY = e.pageY;
+		}
+	} ).on( 'click', 'div.link', function (e) {
+		if ( e.altKey ) {
+			$(links_window.document.getElementById(this.id)).remove();
+			$(this).remove();
+			e.stopPropagation();
+		}
+	} );
+
+</script>
+
