@@ -67,6 +67,7 @@
 
 	$('#upfile').on( 'change', function (e) {
 		var name = $('#upfile').val();
+		if ( name.match(/fakepath/) ) name = name.split('\\').pop();
 		$('#background').css( {
 			'background-image': 'url(' + encodeURI(name) + ')',
 			width: '768px', height: '1024px'
