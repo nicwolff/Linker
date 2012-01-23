@@ -34,28 +34,29 @@
 	links_window.moveTo(769 + 15, 0);
 	self.focus();
 
-	var currentX = -1;
-	var currentY = -1;
+	var left = -1;
+	var top = -1;
 	var n_links = 0;
 
 	$('body').click( function (e) {
-		if ( currentX >= 0 ) {
+		if ( left >= 0 ) {
 			$(this).append( $('<div id="link-' + ++n_links + '" class="link"></div>') );
-			var dims = '{{' + currentX + ',' + currentY + '},{' + e.pageX - currentX + ',' + e.pageY - currentY + '}}';
+			var width = e.pageX - left - 1;
+			var height = e.pageY - top - 1;
+			var dims = '{{' + left + ',' + top + '},{' + width + ',' + height + '}}';
 			$('#link-' + n_links)
 				.css( {
-					left: currentX, top: currentY,
-					width: e.pageX - currentX - 1,
-					height: e.pageY - currentY - 2
+					left: left, top: top,
+					width: width, height: height
 				} )
 				.append(dims);
 			$(links_window.document.getElementById('links'))
 				.append('<div id="link-' + n_links + '"><span>"URL"</span> "' + dims + '"</div>');
 			$(links_window.document.getElementById('check')).show();
-			currentX = currentY = -1;
+			left = top = -1;
 		} else {
-			currentX = e.pageX;
-			currentY = e.pageY;
+			left = e.pageX;
+			top = e.pageY;
 		}
 	} ).on( 'click', 'div.link', function (e) {
 		if ( e.altKey ) {
