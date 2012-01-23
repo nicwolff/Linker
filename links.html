@@ -29,7 +29,7 @@
 
 	links_window = window.open(
 		'blank.html', 'links_window',
-		'location=0,status=0,scrollbars=0,width=400,height=600'
+		'location=0,status=0,scrollbars=0,width=400,height=800'
 	);
 	links_window.moveTo(769 + 15, 0);
 	self.focus();
@@ -51,7 +51,10 @@
 				} )
 				.append(dims);
 			$(links_window.document.getElementById('links'))
-				.append('<div id="link-' + n_links + '"><span>"URL"</span> "' + dims + '"</div>');
+				.append(
+					$('<div id="link-' + n_links + '">')
+				    	.text('<dict><key>view-type</key><string>link</string><key>final-coordinates</key><string>' + dims + '</string><key>page-number</key><string>000</string></dict>')
+				);
 			$(links_window.document.getElementById('check')).show();
 			left = top = -1;
 		} else {
