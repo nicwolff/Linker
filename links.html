@@ -6,14 +6,12 @@
 		cursor: crosshair;
 	}
 	#background {
-		width: 768px; height: 1024px;
 		background-repeat: no-repeat;
-		background-image: url(screen.png);
 	}
 	div.link {
 		position: absolute;
-		background-color: white; opacity: .5;
 		width: 200px; height: 100px;
+		background-color: #fcc; opacity: .5;
 		border: 1px solid red;
 		font-family: Verdana;
 		font-size: 8px;
@@ -47,8 +45,8 @@
 			$('#link-' + n_links)
 				.css( {
 					left: currentX, top: currentY,
-					width: e.pageX - currentX,
-					height: e.pageY - currentY
+					width: e.pageX - currentX - 1,
+					height: e.pageY - currentY - 2
 				} )
 				.append(dims);
 			$(links_window.document.getElementById('links'))
@@ -69,9 +67,13 @@
 
 	$('#upfile').on( 'change', function (e) {
 		var name = $('#upfile').val();
-		$('#background').css( 'background-image', 'url(' + encodeURI(name) + ')' );
+		$('#background').css( {
+			'background-image': 'url(' + encodeURI(name) + ')',
+			width: '768px', height: '1024px'
+		} );
 		$(links_window.document.getElementById('links')).empty();
 		$('.link').remove();
+		$(links_window.document.getElementById('check')).hide();
 	} ).click( function (e) { e.stopPropagation() } );
 
 </script>
