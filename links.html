@@ -20,8 +20,8 @@
 	}
 </style>
 
-<head><title>Linker</title></head>
-<body><div id="background"></div></body>
+<title>Linker</title>
+<div id="background"></div>
 <form id="upform"><input id="upfile" type="file"></form>
 
 <script type="text/javascript" charset="utf-8">
@@ -69,6 +69,8 @@
 	$('#upfile').on( 'change', function (e) {
 		var name = $('#upfile').val();
 		$('#background').css( 'background-image', 'url(' + encodeURI(name) + ')' );
+		$(links_window.document.getElementById('links')).empty();
+		$('.link').remove();
 	} ).click( function (e) { e.stopPropagation() } );
 
 </script>
