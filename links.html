@@ -41,7 +41,7 @@
 	$('body').click( function (e) {
 		if ( currentX >= 0 ) {
 			$(this).append( $('<div id="link-' + ++n_links + '" class="link"></div>') );
-			var dims = '{{' + currentX + ',' + currentY + '},{' + e.pageX + ',' + e.pageY + '}}';
+			var dims = '{{' + currentX + ',' + currentY + '},{' + e.pageX - currentX + ',' + e.pageY - currentY + '}}';
 			$('#link-' + n_links)
 				.css( {
 					left: currentX, top: currentY,
