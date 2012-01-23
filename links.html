@@ -52,7 +52,8 @@
 				} )
 				.append(dims);
 			$(links_window.document.getElementById('links'))
-				.append('<div contentEditable="true" id="link-' + n_links + '">' + dims + '</div>');
+				.append('<div id="link-' + n_links + '"><span>"URL"</span> "' + dims + '"</div>');
+			$(links_window.document.getElementById('check')).show();
 			currentX = currentY = -1;
 		} else {
 			currentX = e.pageX;

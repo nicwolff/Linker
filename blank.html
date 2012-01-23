@@ -1,2 +1,21 @@
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+<style type="text/css" media="screen">
+	body { font-family: Verdana; }
+	#links { margin-bottom: 1em; }
+	span { width: 150px; }
+	#check { display: none; }
+</style>
+
 <title>Links</title>
 <div id="links"></div>
+<div id="check">
+	<input type="checkbox" id="edit">
+	<label for="edit">Editable</label>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+$('#edit').change( function () {
+	$('#links div').prop( 'contenteditable', $('#edit').is(':checked') );
+} )
+</script>
