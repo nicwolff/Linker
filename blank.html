@@ -10,7 +10,7 @@
 		background-color: #eee;
 		margin-bottom: 1em;
 	}
-	#links div { margin: 6px; }
+	#links div { margin: 6px; white-space: pre; }
 	span { width: 150px; }
 	#check { display: none; }
 </style>
@@ -24,12 +24,19 @@
 
 <div>
 	<h2>How to use this</h2>
+	<p>(You may have to put these HTML files in the same directory as the images.)</p>
 	<p>First, select an image file with the file upload control in the other window.</p>
 	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Option-click a link area to remove it.</p>
-	<p>Click the "Editable" checkbox above to edit the URLs, then uncheck it again so you can copy the text and paste it into the page's plist.</p>
+	<p>Click the "Editable" checkbox above to edit the page-numbers (replacing some with URLs), then uncheck it again so you can copy the text and paste it into the page's plist.</p>
+	<p>Finally you can click the "Next" button to load the next numbered image.</p>
 </div>
 <script type="text/javascript" charset="utf-8">
 $('#edit').change( function () {
 	$('#links div').prop( 'contenteditable', $('#edit').is(':checked') );
-} )
+} );
+$('#links').on( 'mouseenter', 'div', function (e) {
+	$(window.opener.document.getElementById(this.id)).css( 'outline-width', '5px' );
+} ).on( 'mouseleave', 'div', function (e) {
+	$(window.opener.document.getElementById(this.id)).css( 'outline-width', '1px' );
+} );
 </script>

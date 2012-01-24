@@ -9,7 +9,7 @@
 		position: absolute;
 		width: 200px; height: 100px;
 		background-color: #fcc; opacity: .5;
-		border: 1px solid red;
+		outline: 1px solid red;
 		font-family: Verdana;
 		font-size: 8px;
 	}
@@ -28,7 +28,7 @@
 
 	links_window = window.open(
 		'blank.html', 'links_window',
-		'location=0,status=0,scrollbars=0,width=400,height=800'
+		'location=0,status=0,scrollbars=1,width=400,height=800'
 	);
 	links_window.moveTo(769 + 15, 0);
 	self.focus();
@@ -52,7 +52,7 @@
 			$(links_window.document.getElementById('links'))
 				.append(
 					$('<div id="link-' + n_links + '">')
-				    	.text('<dict><key>view-type</key><string>link</string><key>final-coordinates</key><string>' + dims + '</string><key>page-number</key><string>000</string></dict>')
+				    	.text('<dict>\n\t<key>view-type</key>\n\t<string>link</string>\n\t<key>final-coordinates</key>\n\t<string>' + dims + '</string>\n\t<key>page-number</key>\n\t<string>000</string>\n</dict>')
 				);
 			$(links_window.document.getElementById('check')).show();
 			left = top = -1;
