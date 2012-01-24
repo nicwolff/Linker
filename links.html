@@ -50,10 +50,16 @@
 				} )
 				.append(dims);
 			$(links_window.document.getElementById('links'))
-				.append(
-					$('<div id="link-' + n_links + '">')
-				    	.text('<dict>\n\t<key>view-type</key>\n\t<string>link</string>\n\t<key>final-coordinates</key>\n\t<string>' + dims + '</string>\n\t<key>page-number</key>\n\t<string>000</string>\n</dict>')
-				);
+				.append( $('<div id="link-' + n_links + '">').text( [
+					'<dict>',
+					'\t<key>view-type</key>',
+					'\t<string>link</string>',
+					'\t<key>final-coordinates</key>',
+					'\t<string>' + dims + '</string>',
+					'\t<key>page-number</key>',
+					'\t<string>000</string>',
+					'</dict>'
+				].join('\n') ) );
 			$(links_window.document.getElementById('check')).show();
 			left = top = -1;
 		} else {
