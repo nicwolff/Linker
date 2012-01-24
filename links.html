@@ -66,6 +66,10 @@
 			$(this).remove();
 			e.stopPropagation();
 		}
+	} ).on( 'mouseenter', 'div.link', function (e) {
+		$(links_window.document.getElementById(this.id)).css( 'color', 'red' );
+	} ).on( 'mouseleave', 'div.link', function (e) {
+		$(links_window.document.getElementById(this.id)).css( 'color', 'black' );
 	} );
 
 	$('#upfile').on( 'change', function (e) {
