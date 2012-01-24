@@ -21,6 +21,8 @@
 
 <script type="text/javascript" charset="utf-8">
 
+	$('#next').prop('disabled', true);
+
 	window.moveTo(0, 0);
 	window.resizeTo( 768 + 15, window.screen.availHeight );
 
@@ -67,6 +69,7 @@
 	} );
 
 	$('#upfile').on( 'change', function (e) {
+		$('#next').prop('disabled', false);
 		var name = $('#upfile').val();
 		if ( name.match(/fakepath/) ) name = name.split('\\').pop();
 		$('#background').prop( 'src', encodeURI(name) )
@@ -75,6 +78,22 @@
 		$('.link').remove();
 		$(links_window.document.getElementById('check')).hide();
 	} ).click( function (e) { e.stopPropagation() } );
+
+	$('#next').on( 'click', function (e) {
+		var name = $('#upfile').val();
+		var parts = name.split(/(\d+)/g);
+		var last_number;
+	  for ( var i=0; i < parts.length; i++ ) {
+			if ( ! parts[i].match(/\D+/) ) { last_number = i }
+		}
+		var num_length = parts[last_number].length;
+		parts[last_number]++;
+		while ( String(parts[last_number]).length < num_length ) {
+			parts[last_number] = '0' + parts[last_number];
+		}
+		$('#background').prop( 'src', encodeURI(parts.join('')) );
+		return false;
+	} );
 
 </script>
 
