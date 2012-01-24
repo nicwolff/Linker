@@ -5,9 +5,6 @@
 		margin: 0;
 		cursor: crosshair;
 	}
-	#background {
-		background-repeat: no-repeat;
-	}
 	div.link {
 		position: absolute;
 		width: 200px; height: 100px;
@@ -19,8 +16,8 @@
 </style>
 
 <title>Linker</title>
-<div id="background"></div>
-<form id="upform"><input id="upfile" type="file"></form>
+<img id="background">
+<form id="upform"><input id="upfile" type="file"> <input type="submit" id="next" value="Next"></form>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -72,10 +69,8 @@
 	$('#upfile').on( 'change', function (e) {
 		var name = $('#upfile').val();
 		if ( name.match(/fakepath/) ) name = name.split('\\').pop();
-		$('#background').css( {
-			'background-image': 'url(' + encodeURI(name) + ')',
-			width: '768px', height: '1024px'
-		} );
+		$('#background').prop( 'src', encodeURI(name) )
+			.css( { width: '768px', height: '1004px' } );
 		$(links_window.document.getElementById('links')).empty();
 		$('.link').remove();
 		$(links_window.document.getElementById('check')).hide();
