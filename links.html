@@ -76,11 +76,7 @@
 		$('#next').prop('disabled', false);
 		var name = $('#upfile').val();
 		if ( name.match(/fakepath/) ) name = name.split('\\').pop();
-		$('#background').prop( 'src', encodeURI(name) )
-			.css( { width: '768px', height: '1004px' } );
-		$(links_window.document.getElementById('links')).empty();
-		$('.link').remove();
-		$(links_window.document.getElementById('check')).hide();
+		update_image(name);
 	} ).click( function (e) { e.stopPropagation() } );
 
 	$('#next').on( 'click', function (e) {
@@ -95,9 +91,17 @@
 		while ( String(parts[last_number]).length < num_length ) {
 			parts[last_number] = '0' + parts[last_number];
 		}
-		$('#background').prop( 'src', encodeURI(parts.join('')) );
+		update_image( encodeURI(parts.join('')) );
 		return false;
 	} );
+
+	function update_image (name) {
+		$('#background').prop( 'src', encodeURI(name) )
+			.css( { width: '768px', height: '1004px' } );
+		$(links_window.document.getElementById('links')).empty();
+		$('.link').remove();
+		$(links_window.document.getElementById('check')).hide();
+	}
 
 </script>
 
