@@ -55,16 +55,14 @@
 
 	$('#background').click( function (e) {
 		if ( left >= 0 ) {
-			$('body').append( $('<div id="link-' + ++n_links + '" class="link"></div>') );
 			var width = e.pageX - left - 1;
 			var height = e.pageY - top - 1;
 			var dims = '{{' + left + ',' + top + '},{' + width + ',' + height + '}}';
-			$('#link-' + n_links)
-				.css( {
-					left: left, top: top,
-					width: width, height: height
-				} )
-				.append(dims);
+			$('body').append(
+				$('<div id="link-' + ++n_links + '" class="link"></div>')
+					.css( { left: left, top: top, width: width, height: height } )
+					.append(dims)
+			);
 			$(links_window.document.getElementById('links'))
 				.append( $('<div id="link-' + n_links + '">').text( [
 					'<dict>',
