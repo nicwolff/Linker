@@ -103,7 +103,6 @@
 	} ).click( function (e) { e.stopPropagation() } );
 
 	$('#next').on( 'click', function (e) {
-		alert(filename);
 		var parts = filename.split(/(\d+)/g);
 		var last_number;
 	  for ( var i=0; i < parts.length; i++ ) {
