@@ -13,33 +13,44 @@
 		font-family: Verdana;
 		font-size: 8px;
 	}
+	#background { margin-bottom: 40px; }
+	#upform {
+		position: fixed; clear: both;
+		width: 100%;
+		margin: 0; padding: 6px;
+		bottom: 0; border: none; border-top: 1px solid #666;
+		background-color: white; opacity: .8;
+	}
 </style>
 
 <title>Linker</title>
 <img id="background">
-<form id="upform"><input id="upfile" type="file"> <input type="submit" id="next" value="Next"></form>
+<form id="upform">
+	<input id="upfile" type="file">
+	<input type="submit" id="next" value="Next">
+</form>
 
 <script type="text/javascript" charset="utf-8">
 
 	$('#next').prop('disabled', true);
 
 	window.moveTo(0, 0);
-	window.resizeTo( 768 + 15, window.screen.availHeight );
+	window.resizeTo( 768, window.screen.availHeight );
 
 	links_window = window.open(
 		'blank.html', 'links_window',
 		'location=0,status=0,scrollbars=1,width=400,height=800'
 	);
-	links_window.moveTo(769 + 15, 0);
+	links_window.moveTo(769, 0);
 	self.focus();
 
 	var left = -1;
 	var top = -1;
 	var n_links = 0;
 
-	$('body').click( function (e) {
+	$('#background').click( function (e) {
 		if ( left >= 0 ) {
-			$(this).append( $('<div id="link-' + ++n_links + '" class="link"></div>') );
+			$('body').append( $('<div id="link-' + ++n_links + '" class="link"></div>') );
 			var width = e.pageX - left - 1;
 			var height = e.pageY - top - 1;
 			var dims = '{{' + left + ',' + top + '},{' + width + ',' + height + '}}';
@@ -66,7 +77,8 @@
 			left = e.pageX;
 			top = e.pageY;
 		}
-	} ).on( 'click', 'div.link', function (e) {
+	} );
+	$('body').on( 'click', 'div.link', function (e) {
 		if ( e.altKey ) {
 			$(links_window.document.getElementById(this.id)).remove();
 			$(this).remove();
