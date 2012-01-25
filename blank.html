@@ -31,17 +31,12 @@
 
 <div>
 	<h2>How to use this</h2>
-	<p>(You may have to put these HTML files in the same directory as the images.)</p>
+	<p>Put these HTML files in the same directory as the issue plists.</p>
 	<p>First, select an image file with the file upload control in the other window.</p>
 	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Option-click a link area to remove it.</p>
 	<p>Click the "Editable" checkbox above to edit the page-numbers (replacing some with URLs), then uncheck it again so you can copy the text and paste it into the page's plist.</p>
 	<p>Finally you can click the "Next" button to load the next numbered image.</p>
 </div>
-
-<form id="upform">
-	<input id="upfile" type="file">
-	<input type="submit" id="next" value="Next">
-</form>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -53,31 +48,6 @@ $('#links').on( 'mouseenter', 'div', function (e) {
 	$(window.opener.document.getElementById(this.id)).css( 'outline-width', '5px' );
 } ).on( 'mouseleave', 'div', function (e) {
 	$(window.opener.document.getElementById(this.id)).css( 'outline-width', '1px' );
-} );
-
-$('#upfile').on( 'change', function (e) {
-	var name = $('#upfile').val();
-	if ( name.match(/fakepath/) ) name = name.split('\\').pop();
-	$.get( name, function (xml) {
-		var n_links = 0;
-		var xs = new XMLSerializer;
-		$(xml).find('array').children().each( function () {
-			$('#links').append(
-				$('<div id="link-' + ++n_links + '"></div')
-					.text(xs.serializeToString(this).replace(/ +<\/dict/g, '</dict'))
-			);
-			$(this).children().each( function () {
-				var dims = $(this).text();
-				var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-				if ( m ) {
-					var link = $('<div id="link-' + n_links + '" class="link"></div>');
-					link.append(dims);
-					$(window.opener.document.body).append(link);
-					link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
-				}
-			} );
-		} );
-	} );
 } );
 
 </script>
