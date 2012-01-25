@@ -21,11 +21,16 @@
 		bottom: 0; border: none; border-top: 1px solid #666;
 		background-color: white; opacity: .8;
 	}
+	#height { float: right; margin-right: 20px; }
 </style>
 
 <title>Linker</title>
 <img id="background">
 <form id="upform">
+	<select id="height">
+		<option value="928px">Height: 928px</option>
+		<option value="1004px" selected="selected">Height: 1004px</option>
+	</select>
 	<input id="upfile" type="file">
 	<input type="submit" id="next" value="Next">
 </form>
@@ -113,6 +118,10 @@
 		return false;
 	} );
 
+	$('#height').on( 'change', function (e) {
+		$('#background').css( 'height', $(this).val() );
+	} );
+
 	function update_image (name) {
 		$('#background').prop( 'src', encodeURI(name) )
 			.css( { height: '1004px' } );
@@ -122,4 +131,3 @@
 	}
 
 </script>
-
