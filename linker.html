@@ -146,7 +146,6 @@
 					var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
 					if ( m ) {
 						var link = $('<div id="link-' + n_links + '" class="link"></div>');
-						link.append(dims);
 						$('body').append(link);
 						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
 					}
