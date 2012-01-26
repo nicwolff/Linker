@@ -43,11 +43,7 @@
 	window.moveTo(0, 0);
 	window.resizeTo( 768, window.screen.availHeight );
 
-	links_window = window.open(
-		'blank.html', 'links_window',
-		'location=0,status=0,scrollbars=1,width=400,height=800'
-	);
-	links_window.moveTo(769, 0);
+	var links_window = open_links_window();
 	self.focus();
 
 	var left = -1;
@@ -171,6 +167,65 @@
 		} );
 	}
 
+	function open_links_window () {
 
+		var win = window.open(
+			'', 'links_window',
+			'location=0,status=0,scrollbars=1,width=400,height=800'
+		);
+		win.moveTo(769, 0);
+
+		win.document.writeln( '<style type="text/css" media="screen">' );
+		win.document.writeln( '	body { font-family: Verdana; font-size: 12px; margin: 10px; }' );
+		win.document.writeln( '	h2 { font-size: 14px; }' );
+		win.document.writeln( '	#upform {' );
+		win.document.writeln( '		position: fixed; clear: both;' );
+		win.document.writeln( '		width: 100%;' );
+		win.document.writeln( '		margin: 0; padding: 6px; margin-left: -10px;' );
+		win.document.writeln( '		bottom: 0; border: none; border-top: 1px solid #666;' );
+		win.document.writeln( '		background-color: white; opacity: .8;' );
+		win.document.writeln( '	}' );
+		win.document.writeln( '	#links {' );
+		win.document.writeln( '		padding: 6px;' );
+		win.document.writeln( '		border-width: 1px;' );
+		win.document.writeln( '		border-style: inset;' );
+		win.document.writeln( '		background-color: #eee;' );
+		win.document.writeln( '		margin-bottom: 1em;' );
+		win.document.writeln( '	}' );
+		win.document.writeln( '	#links div { margin: 6px; white-space: pre; }' );
+		win.document.writeln( '	span { width: 150px; }' );
+		win.document.writeln( '	#check { display: none; }' );
+		win.document.writeln( '</style>' );
+		win.document.writeln( '' );
+		win.document.writeln( '<title>Links</title>' );
+		win.document.writeln( '<div id="links"></div>' );
+		win.document.writeln( '<div id="check">' );
+		win.document.writeln( '	<input type="checkbox" id="edit">' );
+		win.document.writeln( '	<label for="edit">Editable</label>' );
+		win.document.writeln( '</div>' );
+		win.document.writeln( '' );
+		win.document.writeln( '<div>' );
+		win.document.writeln( '	<h2>How to use this</h2>' );
+		win.document.writeln( '	<p>Put these HTML files in the same directory as the issue plists.</p>' );
+		win.document.writeln( '	<p>First, select an image file with the file upload control in the other window.</p>' );
+		win.document.writeln( '	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Option-click a link area to remove it.</p>' );
+		win.document.writeln( '	<p>Click the "Editable" checkbox above to edit the page-numbers (replacing some with URLs), then uncheck it again so you can copy the text and paste it into the page"s plist.</p>' );
+		win.document.writeln( '	<p>Finally you can click the "Next" button to load the next numbered image.</p>' );
+		win.document.writeln( '</div>' );
+
+		var d = win.document;
+
+		$('#edit', d).change( function () {
+			$('#links div', d).prop( 'contenteditable', $('#edit', d).is(':checked') );
+		} );
+
+		$('#links', d).on( 'mouseenter', 'div', function (e) {
+			$('#' + this.id).css( 'outline-width', '5px' );
+		} ).on( 'mouseleave', 'div', function (e) {
+			$('#' + this.id).css( 'outline-width', '1px' );
+		} );
+
+		return win;
+	}
 
 </script>
