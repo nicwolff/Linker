@@ -32,13 +32,13 @@
 		<option value="1004px" selected="selected">Height: 1004px</option>
 	</select>
 	<input id="upfile" type="file">
-	<input type="submit" id="prev" value="< Prev">
-	<input type="submit" id="next" value="Next >">
+	<input type="submit" id="prev" class="nav" value="< Prev">
+	<input type="submit" id="next" class="nav" value="Next >">
 </form>
 
 <script type="text/javascript" charset="utf-8">
 
-	$('#next').prop('disabled', true);
+	$('.nav').prop('disabled', true);
 
 	window.moveTo(0, 0);
 	window.resizeTo( 768, window.screen.availHeight );
@@ -92,7 +92,7 @@
 	var filename;
 
 	$('#upfile').on( 'change', function (e) {
-		$('#next').prop('disabled', false);
+		$('.nav').prop('disabled', false);
 		filename = $('#upfile').val();
 		filename = filename.split('\\').pop();
 		update_image(filename);
