@@ -146,24 +146,33 @@
 	function update_plist (filename) {
 		var plistname = filename;
 		plistname = plistname.replace( 'jpg', 'plist' );
-		$.get( plistname, function (xml) {
-			n_links = 0;
-			var xs = new XMLSerializer;
-			$(xml).find('array').children().each( function () {
-				$(links_window.document.getElementById('links')).append(
-					$('<div id="link-' + ++n_links + '"></div')
-						.text(xs.serializeToString(this).replace(/ +<\/dict/g, '</dict'))
-				);
-				$(this).children().each( function () {
-					var dims = $(this).text();
-					var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-					if ( m ) {
-						var link = $('<div id="link-' + n_links + '" class="link"></div>');
-						$('body').append(link);
-						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
-					}
+		$.ajax( {
+			url: plistname,
+			success: function (xml) {
+				n_links = 0;
+				var xs = new XMLSerializer;
+				$(xml).find('array').children().each( function () {
+					$(links_window.document.getElementById('links')).append(
+						$('<div id="link-' + ++n_links + '"></div')
+							.text(xs.serializeToString(this).replace(/ +<\/dict/g, '</dict'))
+					);
+					$(links_window.document.getElementById('check')).show();
+					$(this).children().each( function () {
+						var dims = $(this).text();
+						var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
+						if ( m ) {
+							var link = $('<div id="link-' + n_links + '" class="link"></div>');
+							$('body').append(link);
+							link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+						}
+					} );
 				} );
-			} );
+			},
+			error: function () {
+				if( this.tries++ > 2 ) return;
+				this.url = this.url.replace( /(\d+\.plist)/, '0$&' );
+				$.ajax(this);
+			}
 		} );
 	}
 
