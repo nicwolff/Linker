@@ -99,34 +99,17 @@
 	} ).click( function (e) { e.stopPropagation() } );
 
 	$('#prev').on( 'click', function (e) {
-		var parts = filename.split(/(\d+)/g);
-		var last_number;
-	  for ( var i=0; i < parts.length; i++ ) {
-			if ( ! parts[i].match(/\D+/) ) { last_number = i }
-		}
-		var num_length = parts[last_number].length;
-		if ( --parts[last_number] > 0 ) {
-			while ( String(parts[last_number]).length < num_length ) {
-				parts[last_number] = '0' + parts[last_number];
-			}
-			filename = parts.join('');
+		var n = filename.match( /(\d+)\.jpg/ )[1];
+		if ( n > 1 ) {
+			filename = filename.replace( /\d+\.jpg/, Number(n) - 1 + '.jpg' );
 			update_image();
 		}
 		return false;
 	} );
 
 	$('#next').on( 'click', function (e) {
-		var parts = filename.split(/(\d+)/g);
-		var last_number;
-	  for ( var i=0; i < parts.length; i++ ) {
-			if ( ! parts[i].match(/\D+/) ) { last_number = i }
-		}
-		var num_length = parts[last_number].length;
-		parts[last_number]++;
-		while ( String(parts[last_number]).length < num_length ) {
-			parts[last_number] = '0' + parts[last_number];
-		}
-		filename = parts.join('');
+		var n = filename.match( /(\d+)\.jpg/ )[1];
+		filename = filename.replace( /\d+\.jpg/, Number(n) + 1 + '.jpg' );
 		update_image();
 		return false;
 	} );
