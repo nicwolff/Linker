@@ -32,7 +32,8 @@
 		<option value="1004px" selected="selected">Height: 1004px</option>
 	</select>
 	<input id="upfile" type="file">
-	<input type="submit" id="next" value="Next">
+	<input type="submit" id="prev" value="< Prev">
+	<input type="submit" id="next" value="Next >">
 </form>
 
 <script type="text/javascript" charset="utf-8">
@@ -101,6 +102,23 @@
 		update_image(filename);
 	} ).click( function (e) { e.stopPropagation() } );
 
+	$('#prev').on( 'click', function (e) {
+		var parts = filename.split(/(\d+)/g);
+		var last_number;
+	  for ( var i=0; i < parts.length; i++ ) {
+			if ( ! parts[i].match(/\D+/) ) { last_number = i }
+		}
+		var num_length = parts[last_number].length;
+		if ( --parts[last_number] > 0 ) {
+			while ( String(parts[last_number]).length < num_length ) {
+				parts[last_number] = '0' + parts[last_number];
+			}
+			filename = parts.join('');
+			update_image();
+		}
+		return false;
+	} );
+
 	$('#next').on( 'click', function (e) {
 		var parts = filename.split(/(\d+)/g);
 		var last_number;
@@ -112,8 +130,7 @@
 		while ( String(parts[last_number]).length < num_length ) {
 			parts[last_number] = '0' + parts[last_number];
 		}
-		var next = parts.join('');
-		filename = next;
+		filename = parts.join('');
 		update_image();
 		return false;
 	} );
