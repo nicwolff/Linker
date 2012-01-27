@@ -223,7 +223,14 @@
 		d.close();
 
 		$('#edit', d).change( function () {
-			$('#links div', d).prop( 'contenteditable', $('#edit', d).is(':checked') );
+			if ( $('#edit', d).is(':checked') ) {
+				$('#links div', d).prop( 'contenteditable', true );
+			} else {
+				$('#links div', d).prop( 'contenteditable', false ).each( function () {
+					var m = $(this).text().match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
+					$('#' + this.id).css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+				} );
+			}
 		} );
 
 		$('#links', d).on( 'mouseenter', 'div', function (e) {
