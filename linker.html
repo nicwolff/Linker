@@ -84,9 +84,9 @@
 			e.stopPropagation();
 		}
 	} ).on( 'mouseenter', 'div.link', function (e) {
-		$(links_window.document.getElementById(this.id)).css( 'outline-width', '3px' );
+		$(links_window.document.getElementById(this.id)).css( 'color', 'red' );
 	} ).on( 'mouseleave', 'div.link', function (e) {
-		$(links_window.document.getElementById(this.id)).css( 'outline-width', 0 );
+		$(links_window.document.getElementById(this.id)).css( 'color', 'black' );
 	} );
 
 	var filename;
@@ -186,7 +186,7 @@
 		d.writeln( '		background-color: #eee;' );
 		d.writeln( '		margin-bottom: 1em;' );
 		d.writeln( '	}' );
-		d.writeln( '	#links div { margin: 6px; white-space: pre; outline: 0px solid red; }' );
+		d.writeln( '	#links div { margin: 6px; white-space: pre; }' );
 		d.writeln( '	span { width: 150px; }' );
 		d.writeln( '	#check { display: none; }' );
 		d.writeln( '</style>' );
