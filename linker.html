@@ -154,6 +154,7 @@
 			var s1 = s.replace( /\d+/, function (n) { return ++n } );
 			return s1.replace( 'jpg', 'plist' );
 		} );
+		$('#filename', ld).text( plistname );
 		$.ajax( {
 			url: plistname,
 			tries: 0,
@@ -202,6 +203,7 @@
 		d.writeln( '<style type="text/css" media="screen">' );
 		d.writeln( '	body { font-family: Verdana; font-size: 12px; margin: 10px; }' );
 		d.writeln( '	h2 { font-size: 14px; }' );
+		d.writeln( '	#filename { font-weight: bold; margin-bottom: 3px; }' );
 		d.writeln( '	#upform {' );
 		d.writeln( '		position: fixed; clear: both;' );
 		d.writeln( '		width: 100%;' );
@@ -222,6 +224,7 @@
 		d.writeln( '</style>' );
 		d.writeln( '' );
 		d.writeln( '<title>Links</title>' );
+		d.writeln( '<div id="filename"></div>' );
 		d.writeln( '<div id="links"></div>' );
 		d.writeln( '<div id="check">' );
 		d.writeln( '	<input type="checkbox" checked="checked" id="edit">' );
