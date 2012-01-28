@@ -15,7 +15,7 @@
 		font-family: Verdana;
 		font-size: 8px;
 	}
-	#background { margin-bottom: 40px; height: 1004px; }
+	#background { height: 1004px; }
 	#upform {
 		position: fixed; clear: both;
 		width: 100%;
@@ -61,6 +61,7 @@
 	window.moveTo(0, 0);
 	window.resizeTo(screen.availWidth, window.outerHeight);
 	var chromeWidth = screen.availWidth - document.body.clientWidth;
+	$('#background').css( 'margin-bottom', $('#upform').outerHeight() );
 
 	var lw = open_links_window();
 	var ld = lw.document;
