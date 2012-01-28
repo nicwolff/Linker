@@ -160,7 +160,12 @@
 				$(xml).find('array').children().each( function () {
 					$(ld.getElementById('links')).append(
 						$('<div id="link-' + ++n_links + '"></div')
-							.text(xs.serializeToString(this).replace(/ +<\/dict/g, '</dict'))
+							.text(
+								xs.serializeToString(this)
+								.replace( /\n\s+/g, '\n\t' )
+								.replace( /\t<dict>/, '<dict>' )
+								.replace( /\t<\/dict>/, '<dict>' )
+							)
 					);
 					$(ld.getElementById('check')).show();
 					$(this).children().each( function () {
