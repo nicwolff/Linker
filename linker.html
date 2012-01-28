@@ -62,7 +62,8 @@
 	window.resizeTo(screen.availWidth, window.outerHeight);
 	var chromeWidth = screen.availWidth - document.body.clientWidth;
 
-	var ld = open_links_window().document;
+	var lw = open_links_window();
+	var ld = lw.document;
 	self.focus();
 
 	var pages = [];
@@ -165,6 +166,7 @@
 		$('#h-guide').css( 'width', width ).show();
 		width = Number( width.replace( 'px', '' ) );
 		window.resizeTo( width + chromeWidth, window.screen.availHeight );
+		lw.moveTo(width + chromeWidth + 1, 0);
 	}
 
 	function update_image () {
@@ -231,7 +233,6 @@
 			'', 'links_window',
 			'location=0,status=0,scrollbars=1,width=400,height=800'
 		);
-		win.moveTo(769, 0);
 
 		var d = win.document;
 
