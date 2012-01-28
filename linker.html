@@ -64,6 +64,16 @@
 	var top = -1;
 	var n_links = 0;
 
+	$(document).keydown(function(e){
+		if (e.keyCode == 37) {
+			$('#prev').click();
+			return false;
+		} else if (e.keyCode == 39) {
+			$('#next').click();
+			return false;
+		}
+	});
+
 	$('#background').click( function (e) {
 		if ( left >= 0 ) {
 			var width = e.pageX - left - 1;
