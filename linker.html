@@ -74,16 +74,19 @@
 					.css( { left: left, top: top, width: width, height: height } )
 			);
 			$(ld.getElementById('links'))
-				.append( $('<div id="link-' + n_links + '">').text( [
-					'<dict>',
-					'\t<key>view-type</key>',
-					'\t<string>link</string>',
-					'\t<key>final-coordinates</key>',
-					'\t<string>' + dims + '</string>',
-					'\t<key>url</key>',
-					'\t<string>000</string>',
-					'</dict>'
-				].join('\n') ) );
+				.append( $('<div id="link-' + n_links + '">')
+					.prop( 'contenteditable', true )
+					.text( [
+						'<dict>',
+						'\t<key>view-type</key>',
+						'\t<string>link</string>',
+						'\t<key>final-coordinates</key>',
+						'\t<string>' + dims + '</string>',
+						'\t<key>url</key>',
+						'\t<string>000</string>',
+						'</dict>'
+					].join('\n') )
+				);
 			$(ld.getElementById('check')).show();
 			left = top = -1;
 		} else {
@@ -210,7 +213,7 @@
 		d.writeln( '<title>Links</title>' );
 		d.writeln( '<div id="links"></div>' );
 		d.writeln( '<div id="check">' );
-		d.writeln( '	<input type="checkbox" id="edit">' );
+		d.writeln( '	<input type="checkbox" checked="checked" id="edit">' );
 		d.writeln( '	<label for="edit">Editable</label>' );
 		d.writeln( '</div>' );
 		d.writeln( '' );
