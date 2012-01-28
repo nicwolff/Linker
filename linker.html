@@ -108,13 +108,13 @@
 					].join('\n') )
 				);
 			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
-			$('#links div', ld).prop( 'contenteditable', true );
 			left = top = -1;
 		} else {
 			left = e.pageX + 1;
 			top = e.pageY;
 		}
 	} );
+
 	$('body').on( 'click', 'div.link', function (e) {
 		if ( e.altKey ) {
 			$('#' + this.id, ld).remove();
@@ -206,7 +206,7 @@
 								.replace( /\n\s+/g, '\n\t' )
 								.replace( /\t<dict>/, '<dict>' )
 								.replace( /\t<\/dict>/, '</dict>' )
-							).prop( 'contenteditable', 'true' )
+							)
 					);
 					$('#check', ld).show(); $('#edit', ld).prop('checked', true);
 					$(this).children().each( function () {
@@ -263,37 +263,37 @@
 		d.writeln( '<title>Links</title>' );
 		d.writeln( '<div id="filename"></div>' );
 		d.writeln( '<div id="links"></div>' );
-		d.writeln( '<div id="check">' );
-		d.writeln( '	<input type="checkbox" checked="checked" id="edit">' );
-		d.writeln( '	<label for="edit">Editable</label>' );
-		d.writeln( '</div>' );
-		d.writeln( '' );
 		d.writeln( '<div>' );
 		d.writeln( '	<h2>How to use this</h2>' );
 		d.writeln( '	<p>Put this HTML file in the same directory as the issue plists.</p>' );
 		d.writeln( '	<p>First, select an image file with the file upload control in the other window.</p>' );
 		d.writeln( '	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Shift-click for a page-number. Option-click a link area to remove it.</p>' );
-		d.writeln( '	<p>Edit the links, then uncheck the "Editable" checkbox so you can copy the text and paste it into the page\'s plist.</p>' );
-		d.writeln( '	<p>Finally you can click the "Next" button (or press the right arrow key) to load the next numbered image.</p>' );
+		d.writeln( '	<p>You can double-click the XML links here to edit the coordinates or URLs, then press Enter to see the effect.</p>' );
+		d.writeln( '	<p>When everything looks right, copy the XML text and paste it into the page\'s plist.</p>' );
+		d.writeln( '	<p>Finally you can click the "Next" button (or press the right arrow key) to load the next page.</p>' );
 		d.writeln( '</div>' );
 		d.close();
 
-		$('#edit', d).change( function () {
-			if ( $('#edit', d).is(':checked') ) {
-				$('#links div', d).prop( 'contenteditable', true );
-			} else {
-				$('#links div', d).prop( 'contenteditable', false ).each( function () {
-					var m = $(this).text().match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-					$('#' + this.id).css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
-				} );
+		$('#links', d).on( {
+			mouseenter: function (e) {
+				$('#' + this.id).css( 'outline-width', '5px' );
+			},
+			mouseleave: function (e) {
+				$('#' + this.id).css( 'outline-width', '1px' );
+			},
+			dblclick: function (e) {
+				$(this).prop( 'contenteditable', true ).focus();
+			},
+			keydown: function (e) {
+				if ( e.which == 13 ) {
+					self.blur();
+					$(this).prop( 'contenteditable', false ).each( function () {
+						var m = $(this).text().match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
+						$('#' + this.id).css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+					} );
+				}
 			}
-		} );
-
-		$('#links', d).on( 'mouseenter', 'div', function (e) {
-			$('#' + this.id).css( 'outline-width', '5px' );
-		} ).on( 'mouseleave', 'div', function (e) {
-			$('#' + this.id).css( 'outline-width', '1px' );
-		} );
+		}, 'div' );
 
 		return win;
 	}
