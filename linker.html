@@ -115,17 +115,22 @@
 		}
 	} );
 
-	$('body').on( 'click', 'div.link', function (e) {
-		if ( e.altKey ) {
-			$('#' + this.id, ld).remove();
-			$(this).remove();
-			e.stopPropagation();
+	$('body').on( {
+		click: function (e) {
+			if ( e.altKey ) {
+				$('#' + this.id, ld).remove();
+				$(this).remove();
+				e.stopPropagation();
+			}
+		},
+		mouseenter: function (e) {
+			$('#' + this.id, ld).css( 'color', 'red' );
+		},
+		mouseleave: function (e) {
+			$('#' + this.id, ld).css( 'color', 'black' );
 		}
-	} ).on( 'mouseenter', 'div.link', function (e) {
-		$('#' + this.id, ld).css( 'color', 'red' );
-	} ).on( 'mouseleave', 'div.link', function (e) {
-		$('#' + this.id, ld).css( 'color', 'black' );
-	} ).on( 'mousemove', function (e) {
+	}, 'div.link' )
+	.on( 'mousemove', function (e) {
 		var r = rect(this.getBoundingClientRect());
 		$('#v-guide').css( { left: e.pageX } );
 		$('#h-guide').css( { top: e.pageY - 1 } );
