@@ -111,7 +111,6 @@
 	var filename;
 
 	$('#upfile').on( 'change', function (e) {
-		$('.nav').prop('disabled', false);
 		filename = $('#upfile').val();
 		filename = filename.split('\\').pop();
 		update_image(filename);
@@ -143,6 +142,7 @@
 		$('.link').remove();
 		$('#check', ld).hide();
 		$('#upbox').text( filename );
+		$('.nav').prop('disabled', false);
 		update_plist(filename);
 	}
 
@@ -257,5 +257,25 @@
 
 		return win;
 	}
+
+	var pages = [];
+
+	$.ajax( {
+		url: 'Replica.plist',
+		success: function (xml) {
+			console.log( $(xml).find('array').children() );
+			$(xml).find('array').find('string').each( function (index, page) {
+				console.log(page);
+				pages.push( page.textContent );
+			} );
+			console.log(pages);
+			filename = pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
+			update_image();
+		},
+		error: function () {
+			alert( 'No Replica.plist found. Please put this file in the issue directory.')
+		}
+	} );
+
 
 </script>
