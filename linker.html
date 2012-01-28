@@ -34,6 +34,9 @@
 	}
 	#upfile { opacity: 0; }
 	#height { float: right; margin-right: 20px; }
+	.guide { position: absolute; background-color: #666; pointer-events: none; }
+	#v-guide { width: 1px; height: 2000px; top: 0; }
+	#h-guide { width: 2000px; height: 1px; left: 0; }
 </style>
 
 <title>Linker</title>
@@ -48,6 +51,8 @@
 	<input type="submit" id="prev" class="nav" value="< Prev">
 	<input type="submit" id="next" class="nav" value="Next >">
 </form>
+<div id="v-guide" class="guide"></div>
+<div id="h-guide" class="guide"></div>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -76,7 +81,7 @@
 
 	$('#background').click( function (e) {
 		if ( left >= 0 ) {
-			var width = e.pageX - left - 1;
+			var width = e.pageX - left;
 			var height = e.pageY - top - 1;
 			var dims = '{{' + left + ',' + top + '},{' + width + ',' + height + '}}';
 			$('body').append(
@@ -103,7 +108,7 @@
 			$('#links div', ld).prop( 'contenteditable', true );
 			left = top = -1;
 		} else {
-			left = e.pageX;
+			left = e.pageX + 1;
 			top = e.pageY;
 		}
 	} );
@@ -117,6 +122,10 @@
 		$('#' + this.id, ld).css( 'color', 'red' );
 	} ).on( 'mouseleave', 'div.link', function (e) {
 		$('#' + this.id, ld).css( 'color', 'black' );
+	} ).on( 'mousemove', function (e) {
+		var r = rect(this.getBoundingClientRect());
+		$('#v-guide').css( { left: e.pageX } );
+		$('#h-guide').css( { top: e.pageY - 1 } );
 	} );
 
 	var filename;
@@ -145,7 +154,13 @@
 
 	$('#height').on( 'change', function (e) {
 		$('#background').css( 'height', $(this).val() );
+		show_guides();
 	} );
+
+	function show_guides () {
+		$('#v-guide').css( 'height', $('#background').css('height') ).show();
+		$('#h-guide').css( 'width', $('#background').css('width') ).show();
+	}
 
 	function update_image () {
 		$('#background').prop( 'src', encodeURI('pages/' + filename) );
@@ -158,6 +173,10 @@
 	}
 
 	var xs = new XMLSerializer;
+
+	function rect (r) {
+		return ['rect(', r.top, r.right, r.bottom, r.left, ')'].join(' ');
+	}
 
 	function update_plist (filename) {
 		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1]] + '.plist';
@@ -271,14 +290,12 @@
 	$.ajax( {
 		url: 'Replica.plist',
 		success: function (xml) {
-			console.log( $(xml).find('array').children() );
 			$(xml).find('array').find('string').each( function (index, page) {
-				console.log(page);
 				pages.push( page.textContent );
 			} );
-			console.log(pages);
 			filename = pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
 			update_image();
+			show_guides();
 		},
 		error: function () {
 			alert( 'No Replica.plist found. Please put this file in the issue directory.')
