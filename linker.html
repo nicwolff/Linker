@@ -73,6 +73,10 @@
 				$('<div id="link-' + ++n_links + '" class="link"></div>')
 					.css( { left: left, top: top, width: width, height: height } )
 			);
+			var link = '\t<key>url</key>\n\t<string>http://</string>';
+			if ( e.shiftKey ) {
+				link = '\t<key>page-number</key>\n\t<integer>000</integer>';
+			}
 			$(ld.getElementById('links'))
 				.append( $('<div id="link-' + n_links + '">')
 					.prop( 'contenteditable', true )
@@ -82,8 +86,7 @@
 						'\t<string>link</string>',
 						'\t<key>final-coordinates</key>',
 						'\t<string>' + dims + '</string>',
-						'\t<key>url</key>',
-						'\t<string>000</string>',
+						link,
 						'</dict>'
 					].join('\n') )
 				);
@@ -230,8 +233,8 @@
 		d.writeln( '	<h2>How to use this</h2>' );
 		d.writeln( '	<p>Put this HTML file in the same directory as the issue plists.</p>' );
 		d.writeln( '	<p>First, select an image file with the file upload control in the other window.</p>' );
-		d.writeln( '	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Option-click a link area to remove it.</p>' );
-		d.writeln( '	<p>Click the "Editable" checkbox above to edit the URLs (or page-numbers), then uncheck it again so you can copy the text and paste it into the page\'s plist.</p>' );
+		d.writeln( '	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Shift-click for a page-number. Option-click a link area to remove it.</p>' );
+		d.writeln( '	<p>Edit the links, then uncheck the "Editable" checkbox so you can copy the text and paste it into the page\'s plist.</p>' );
 		d.writeln( '	<p>Finally you can click the "Next" button to load the next numbered image.</p>' );
 		d.writeln( '</div>' );
 		d.close();
