@@ -59,7 +59,8 @@
 	$('.nav').prop('disabled', true);
 
 	window.moveTo(0, 0);
-	window.resizeTo( 768, window.screen.availHeight );
+	window.resizeTo(screen.availWidth, window.outerHeight);
+	var chromeWidth = screen.availWidth - document.body.clientWidth;
 
 	var ld = open_links_window().document;
 	self.focus();
@@ -153,17 +154,25 @@
 	} );
 
 	$('#height').on( 'change', function (e) {
-		$('#background').css( 'height', $(this).val() );
-		show_guides();
+		set_height( $(this).val() );
 	} );
 
-	function show_guides () {
-		$('#v-guide').css( 'height', $('#background').css('height') ).show();
-		$('#h-guide').css( 'width', $('#background').css('width') ).show();
+	function set_height (height) {
+		localStorage.setItem( 'page_height', height );
+		$('#background').css( 'height', height );
+		$('#v-guide').css( 'height', height ).show();
+		var width = $('#background').css('width');
+		$('#h-guide').css( 'width', width ).show();
+		width = Number( width.replace( 'px', '' ) );
+		window.resizeTo( width + chromeWidth, window.screen.availHeight );
 	}
 
 	function update_image () {
 		$('#background').prop( 'src', encodeURI('pages/' + filename) );
+		var saved_height = localStorage.getItem( 'page_height' );
+		if ( saved_height ) {
+			$('#height').val( saved_height ).change();
+		}
 		$('#links', ld).empty();
 		$('.link').remove();
 		$('#check', ld).hide();
@@ -295,7 +304,7 @@
 			} );
 			filename = pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
 			update_image();
-			show_guides();
+			set_height( $('#background').css('height') );
 		},
 		error: function () {
 			alert( 'No Replica.plist found. Please put this file in the issue directory.')
