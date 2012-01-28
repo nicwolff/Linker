@@ -79,7 +79,6 @@
 			}
 			$('#links', ld)
 				.append( $('<div id="link-' + n_links + '">')
-					.prop( 'contenteditable', true )
 					.text( [
 						'<dict>',
 						'\t<key>view-type</key>',
@@ -88,7 +87,7 @@
 						'\t<string>' + dims + '</string>',
 						link,
 						'</dict>'
-					].join('\n') )
+					].join('\n') ).prop( 'contenteditable', true )
 				);
 			$('#check', ld).show();
 			left = top = -1;
@@ -168,7 +167,7 @@
 								.replace( /\n\s+/g, '\n\t' )
 								.replace( /\t<dict>/, '<dict>' )
 								.replace( /\t<\/dict>/, '<dict>' )
-							)
+							).prop( 'contenteditable', $('#edit', ld).is(':checked') )
 					);
 					$('#check', ld).show();
 					$(this).children().each( function () {
