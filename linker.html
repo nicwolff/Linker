@@ -72,15 +72,7 @@
 	var top = -1;
 	var n_links = 0;
 
-	$(document).keydown(function(e){
-		if (e.keyCode == 37) {
-			$('#prev').click();
-			return false;
-		} else if (e.keyCode == 39) {
-			$('#next').click();
-			return false;
-		}
-	});
+	// EVENTS
 
 	$('#background').click( function (e) {
 		if ( left >= 0 ) {
@@ -160,9 +152,21 @@
 		return false;
 	} );
 
+	$(document).keydown(function(e){
+		if (e.keyCode == 37) {
+			$('#prev').click();
+			return false;
+		} else if (e.keyCode == 39) {
+			$('#next').click();
+			return false;
+		}
+	});
+
 	$('#height').on( 'change', function (e) {
 		set_height( $(this).val() );
 	} );
+
+	// FUNCTIONS
 
 	function set_height (height) {
 		localStorage.setItem( 'page_height', height );
@@ -303,6 +307,8 @@
 
 		return win;
 	}
+
+	// OPEN INITIAL PAGE
 
 	$.ajax( {
 		url: 'Replica.plist',
