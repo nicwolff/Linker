@@ -176,6 +176,7 @@
 	}
 
 	function update_image () {
+		localStorage.setItem( 'page_filename', filename );
 		$('#background').prop( 'src', encodeURI('pages/' + filename) );
 		var saved_height = localStorage.getItem( 'page_height' );
 		if ( saved_height ) {
@@ -309,7 +310,8 @@
 			$(xml).find('array').find('string').each( function (index, page) {
 				pages.push( page.textContent );
 			} );
-			filename = pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
+			filename = localStorage.getItem( 'page_filename' ) ||
+				pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
 			update_image();
 			set_height( $('#background').css('height') );
 		},
