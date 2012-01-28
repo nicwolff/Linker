@@ -117,7 +117,7 @@
 
 	$('#prev').on( 'click', function (e) {
 		var n = filename.match( /(\d+)\.jpg/ )[1];
-		if ( n > 1 ) {
+		if ( n > 0 ) {
 			filename = filename.replace( /\d+\.jpg/, Number(n) - 1 + '.jpg' );
 			update_image();
 		}
