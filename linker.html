@@ -57,6 +57,7 @@
 	window.resizeTo( 768, window.screen.availHeight );
 
 	var links_window = open_links_window();
+	var ld = links_window.document;
 	self.focus();
 
 	var left = -1;
@@ -72,7 +73,7 @@
 				$('<div id="link-' + ++n_links + '" class="link"></div>')
 					.css( { left: left, top: top, width: width, height: height } )
 			);
-			$(links_window.document.getElementById('links'))
+			$(ld.getElementById('links'))
 				.append( $('<div id="link-' + n_links + '">').text( [
 					'<dict>',
 					'\t<key>view-type</key>',
@@ -83,7 +84,7 @@
 					'\t<string>000</string>',
 					'</dict>'
 				].join('\n') ) );
-			$(links_window.document.getElementById('check')).show();
+			$(ld.getElementById('check')).show();
 			left = top = -1;
 		} else {
 			left = e.pageX;
@@ -92,14 +93,14 @@
 	} );
 	$('body').on( 'click', 'div.link', function (e) {
 		if ( e.altKey ) {
-			$(links_window.document.getElementById(this.id)).remove();
+			$(ld.getElementById(this.id)).remove();
 			$(this).remove();
 			e.stopPropagation();
 		}
 	} ).on( 'mouseenter', 'div.link', function (e) {
-		$(links_window.document.getElementById(this.id)).css( 'color', 'red' );
+		$(ld.getElementById(this.id)).css( 'color', 'red' );
 	} ).on( 'mouseleave', 'div.link', function (e) {
-		$(links_window.document.getElementById(this.id)).css( 'color', 'black' );
+		$(ld.getElementById(this.id)).css( 'color', 'black' );
 	} );
 
 	var filename;
@@ -133,9 +134,9 @@
 
 	function update_image () {
 		$('#background').prop( 'src', encodeURI('pages/' + filename) );
-		$(links_window.document.getElementById('links')).empty();
+		$(ld.getElementById('links')).empty();
 		$('.link').remove();
-		$(links_window.document.getElementById('check')).hide();
+		$(ld.getElementById('check')).hide();
 		$('#upbox').text( filename );
 		update_plist(filename);
 	}
@@ -150,11 +151,11 @@
 				n_links = 0;
 				var xs = new XMLSerializer;
 				$(xml).find('array').children().each( function () {
-					$(links_window.document.getElementById('links')).append(
+					$(ld.getElementById('links')).append(
 						$('<div id="link-' + ++n_links + '"></div')
 							.text(xs.serializeToString(this).replace(/ +<\/dict/g, '</dict'))
 					);
-					$(links_window.document.getElementById('check')).show();
+					$(ld.getElementById('check')).show();
 					$(this).children().each( function () {
 						var dims = $(this).text();
 						var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
