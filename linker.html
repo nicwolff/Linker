@@ -86,9 +86,10 @@
 						'\t<string>' + dims + '</string>',
 						link,
 						'</dict>'
-					].join('\n') ).prop( 'contenteditable', true )
+					].join('\n') )
 				);
-			$('#check', ld).show();
+			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
+			$('#links div', ld).prop( 'contenteditable', true );
 			left = top = -1;
 		} else {
 			left = e.pageX;
@@ -165,10 +166,10 @@
 								xs.serializeToString(this)
 								.replace( /\n\s+/g, '\n\t' )
 								.replace( /\t<dict>/, '<dict>' )
-								.replace( /\t<\/dict>/, '<dict>' )
-							).prop( 'contenteditable', $('#edit', ld).is(':checked') )
+								.replace( /\t<\/dict>/, '</dict>' )
+							).prop( 'contenteditable', 'true' )
 					);
-					$('#check', ld).show();
+					$('#check', ld).show(); $('#edit', ld).prop('checked', true);
 					$(this).children().each( function () {
 						var dims = $(this).text();
 						var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
