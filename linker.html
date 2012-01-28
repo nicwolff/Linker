@@ -148,7 +148,10 @@
 
 	function update_plist (filename) {
 		var plistname = filename;
-		plistname = plistname.replace( 'jpg', 'plist' );
+		plistname = plistname.replace( /\d+\.jpg/, function (s) {
+			var s1 = s.replace( /\d+/, function (n) { return ++n } );
+			return s1.replace( 'jpg', 'plist' );
+		} );
 		$.ajax( {
 			url: plistname,
 			tries: 0,
