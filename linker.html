@@ -137,6 +137,8 @@
 				var b = t + parseInt(link.css('height'), 10);
 				if ( Math.abs(mouseX - l) < 4 ) { mouseX = l - 1 }
 				if ( Math.abs(mouseX - r) < 4 ) { mouseX = r }
+				if ( Math.abs(mouseY - t) < 4 ) { mouseY = t }
+				if ( Math.abs(mouseY - b) < 4 ) { mouseY = b }
 			} );
 		}
 		$('#v-guide').css( { left: mouseX } );
