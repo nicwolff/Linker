@@ -114,6 +114,7 @@
 			if ( e.altKey ) {
 				$('#' + this.id, ld).remove();
 				$(this).remove();
+				linkLeft = linkTop = -1;
 				e.stopPropagation();
 			}
 		},
