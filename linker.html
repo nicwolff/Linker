@@ -68,20 +68,22 @@
 	self.focus();
 
 	var pages = [];
-	var left = -1;
-	var top = -1;
+	var mouseX = -1;
+	var mouseY = -1;
+	var linkLeft = -1;
+	var linkTop = -1;
 	var n_links = 0;
 
 	// EVENTS
 
 	$('#background').click( function (e) {
-		if ( left >= 0 ) {
-			var width = e.pageX - left;
-			var height = e.pageY - top - 1;
-			var dims = '{{' + left + ',' + top + '},{' + width + ',' + height + '}}';
+		if ( linkLeft >= 0 ) {
+			var width = mouseX - linkLeft;
+			var height = mouseY - linkTop;
+			var dims = '{{' + linkLeft + ',' + linkTop + '},{' + width + ',' + height + '}}';
 			$('body').append(
 				$('<div id="link-' + ++n_links + '" class="link"></div>')
-					.css( { left: left, top: top, width: width, height: height } )
+					.css( { left: linkLeft, top: linkTop, width: width, height: height } )
 			);
 			var link = '\t<key>url</key>\n\t<string>http://</string>';
 			if ( e.shiftKey ) {
@@ -100,10 +102,10 @@
 					].join('\n') )
 				);
 			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
-			left = top = -1;
+			linkLeft = linkTop = -1;
 		} else {
-			left = e.pageX + 1;
-			top = e.pageY;
+			linkLeft = mouseX + 1;
+			linkTop = mouseY;
 		}
 	} );
 
@@ -123,9 +125,22 @@
 		}
 	}, 'div.link' )
 	.on( 'mousemove', function (e) {
-		var r = rect(this.getBoundingClientRect());
-		$('#v-guide').css( { left: e.pageX } );
-		$('#h-guide').css( { top: e.pageY - 1 } );
+		mouseX = e.pageX;
+		mouseY = e.pageY;
+		if ( ! e.altKey ) {
+			// Snapping to link edges
+			$('div.link').each( function () {
+				var link = $(this);
+				var l = link.offset().left
+				var t = link.offset().top;
+				var r = l + parseInt(link.css('width'), 10);
+				var b = t + parseInt(link.css('height'), 10);
+				if ( Math.abs(mouseX - l) < 4 ) { mouseX = l - 1 }
+				if ( Math.abs(mouseX - r) < 4 ) { mouseX = r }
+			} );
+		}
+		$('#v-guide').css( { left: mouseX } );
+		$('#h-guide').css( { top: mouseY } );
 	} );
 
 	var filename;
@@ -277,7 +292,7 @@
 		d.writeln( '	<h2>How to use this</h2>' );
 		d.writeln( '	<p>Put this HTML file in the same directory as the issue plists.</p>' );
 		d.writeln( '	<p>First, select an image file with the file upload control in the other window.</p>' );
-		d.writeln( '	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Shift-click for a page-number. Option-click a link area to remove it.</p>' );
+		d.writeln( '	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Shift-click for a page-number. Hold down the option key to turn off the guide snap. Option-click a link area to remove it.</p>' );
 		d.writeln( '	<p>You can double-click the XML links here to edit the coordinates or URLs, then press Enter to see the effect.</p>' );
 		d.writeln( '	<p>When everything looks right, copy the XML text and paste it into the page\'s plist.</p>' );
 		d.writeln( '	<p>Finally you can click the "Next" button (or press the right arrow key) to load the next page.</p>' );
