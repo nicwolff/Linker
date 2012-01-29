@@ -307,11 +307,11 @@
 				$('#' + this.id).css( 'outline-width', '1px' );
 			},
 			dblclick: function (e) {
-				$(this).prop( 'contenteditable', true ).focus();
+				$(this).css( 'background-color', 'white' ).prop( 'contenteditable', true );
 			},
 			keydown: function (e) {
 				if ( e.which == 13 ) {
-					self.blur();
+					$(this).css( 'background-color', 'inherit' ).blur();
 					$(this).prop( 'contenteditable', false ).each( function () {
 						var m = $(this).text().match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
 						$('#' + this.id).css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
