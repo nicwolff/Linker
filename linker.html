@@ -170,15 +170,18 @@
 		return false;
 	} );
 
-	$(document).keydown(function(e){
-		if (e.keyCode == 37) {
+	$(document).keydown( function (e) {
+		if (e.keyCode == 37) { // left arrow
 			$('#prev').click();
 			return false;
-		} else if (e.keyCode == 39) {
+		} else if (e.keyCode == 39) { // right arrow
 			$('#next').click();
 			return false;
+		} else if (e.keyCode == 27) { // escape
+			linkLeft = linkTop = -1;
+			return false;
 		}
-	});
+	} );
 
 	$('#height').on( 'change', function (e) {
 		set_height( $(this).val() );
