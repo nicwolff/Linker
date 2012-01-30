@@ -74,8 +74,6 @@
 	var pages = [];
 	var mouseX = -1;
 	var mouseY = -1;
-	var linkLeft = -1;
-	var linkTop = -1;
 	var linking;
 	var n_links = 0;
 
@@ -83,9 +81,8 @@
 
 	$('#background').click( function (e) {
 		if ( linking ) {
-			var width = mouseX - linkLeft;
-			var height = mouseY - linkTop;
-			var dims = '{{' + linkLeft + ',' + linkTop + '},{' + width + ',' + height + '}}';
+			var dims = '{{' + linking.offset().left + ',' + linking.offset().top
+			 	+ '},{' + linking.width() + ',' + linking.height() + '}}';
 			var link = '\t<key>url</key>\n\t<string>http://</string>';
 			if ( e.shiftKey ) {
 				link = '\t<key>page-number</key>\n\t<integer>000</integer>';
@@ -106,10 +103,8 @@
 			linking.removeClass().addClass('link').css( 'pointer-events', 'auto' );
 			linking = null;
 		} else {
-			linkLeft = mouseX + 1;
-			linkTop = mouseY;
 			linking = $('<div id="link-' + ++n_links + '" class="linking"></div>').css( {
-				left: linkLeft, top: linkTop,
+				left: mouseX + 1, top: mouseY,
 				width: 0, height: 0
 			} );
 			$('body').append( linking );
@@ -150,7 +145,8 @@
 			} );
 		}
 		if ( linking ) {
-			linking.css( { width: mouseX - linkLeft, height: mouseY - linkTop } );
+			var lo = linking.offset();
+			linking.css( { width: mouseX - lo.left, height: mouseY - lo.top } );
 		}
 		$('#v-guide').css( { left: mouseX } );
 		$('#h-guide').css( { top: mouseY } );
