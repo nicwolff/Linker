@@ -133,8 +133,8 @@
 				var link = $(this);
 				var l = link.offset().left
 				var t = link.offset().top;
-				var r = l + parseInt(link.css('width'), 10);
-				var b = t + parseInt(link.css('height'), 10);
+				var r = l + link.width();
+				var b = t + link.height();
 				if ( Math.abs(mouseX - l) < 4 ) { mouseX = l - 1 }
 				if ( Math.abs(mouseX - r) < 4 ) { mouseX = r }
 				if ( Math.abs(mouseY - t) < 4 ) { mouseY = t }
