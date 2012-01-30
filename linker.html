@@ -7,13 +7,15 @@
 		font-family: Verdana;
 		cursor: crosshair;
 	}
+	div.linking {
+		position: absolute;
+		outline: 1px dashed red;
+		pointer-events: none;
+	}
 	div.link {
 		position: absolute;
-		width: 200px; height: 100px;
 		background-color: #fcc; opacity: .5;
 		outline: 1px solid red;
-		font-family: Verdana;
-		font-size: 8px;
 	}
 	#background { height: 1004px; }
 	#upform {
@@ -34,7 +36,10 @@
 	}
 	#upfile { opacity: 0; }
 	#height { float: right; margin-right: 20px; }
-	.guide { position: absolute; background-color: #666; pointer-events: none; }
+	.guide {
+		position: absolute; background-color: #666;
+		pointer-events: none;
+	}
 	#v-guide { width: 1px; height: 2000px; top: 0; }
 	#h-guide { width: 2000px; height: 1px; left: 0; }
 </style>
@@ -71,19 +76,16 @@
 	var mouseY = -1;
 	var linkLeft = -1;
 	var linkTop = -1;
+	var linking;
 	var n_links = 0;
 
 	// EVENTS
 
 	$('#background').click( function (e) {
-		if ( linkLeft >= 0 ) {
+		if ( linking ) {
 			var width = mouseX - linkLeft;
 			var height = mouseY - linkTop;
 			var dims = '{{' + linkLeft + ',' + linkTop + '},{' + width + ',' + height + '}}';
-			$('body').append(
-				$('<div id="link-' + ++n_links + '" class="link"></div>')
-					.css( { left: linkLeft, top: linkTop, width: width, height: height } )
-			);
 			var link = '\t<key>url</key>\n\t<string>http://</string>';
 			if ( e.shiftKey ) {
 				link = '\t<key>page-number</key>\n\t<integer>000</integer>';
@@ -101,10 +103,16 @@
 					].join('\n') )
 				);
 			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
-			linkLeft = linkTop = -1;
+			linking.removeClass().addClass('link').css( 'pointer-events', 'auto' );
+			linking = null;
 		} else {
 			linkLeft = mouseX + 1;
 			linkTop = mouseY;
+			linking = $('<div id="link-' + ++n_links + '" class="linking"></div>').css( {
+				left: linkLeft, top: linkTop,
+				width: 0, height: 0
+			} );
+			$('body').append( linking );
 		}
 	} );
 
@@ -113,7 +121,7 @@
 			if ( e.altKey ) {
 				$('#' + this.id, ld).remove();
 				$(this).remove();
-				linkLeft = linkTop = -1;
+				if ( linking ) linking.remove();
 				e.stopPropagation();
 			}
 		},
@@ -140,6 +148,9 @@
 				if ( Math.abs(mouseY - t) < 4 ) { mouseY = t - 1 }
 				if ( Math.abs(mouseY - b) < 4 ) { mouseY = b }
 			} );
+		}
+		if ( linking ) {
+			linking.css( { width: mouseX - linkLeft, height: mouseY - linkTop } );
 		}
 		$('#v-guide').css( { left: mouseX } );
 		$('#h-guide').css( { top: mouseY } );
@@ -177,7 +188,8 @@
 			$('#next').click();
 			return false;
 		} else if (e.keyCode == 27) { // escape
-			linkLeft = linkTop = -1;
+			if ( linking ) linking.remove();
+			linking = null;
 			return false;
 		}
 	} );
@@ -218,6 +230,7 @@
 		$('#check', ld).hide();
 		$('#upbox').text( filename );
 		$('.nav').prop('disabled', false);
+		linking = null;
 		update_plist(filename);
 	}
 
@@ -250,7 +263,7 @@
 						var dims = $(this).text();
 						var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
 						if ( m ) {
-							var link = $('<div id="link-' + n_links + '" class="link"></div>');
+							var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
 							$('body').append(link);
 							link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
 						}
