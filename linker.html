@@ -355,7 +355,7 @@
 			filename = localStorage.getItem( 'page_filename' ) ||
 				pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
 			update_image();
-			var saved_height = localStorage.getItem( 'page_height' );
+			var saved_height = localStorage.getItem( 'page_height' ) || '928px';
 			if ( saved_height ) {
 				$('#height').val( saved_height ).change();
 			} else {
