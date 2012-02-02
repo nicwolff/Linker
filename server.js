@@ -77,6 +77,12 @@ String.prototype.printf = function () {
 http.createServer( function (request, response) {
 	var method = request.method.toUpperCase();
 	var resource = url.parse(request.url).pathname;
+	if ( resource.match( /\/\.\.\//g ) ) {
+		response.writeHead( 401, 'Not permitted' );
+		response.end();
+		console.log( 'Illegal request for ' + resource );
+		return;
+	}
 	console.log( 'Routing request for %s to %s(%s)'.printf( request.url, method, resource ) );
 	var h;
 	if ( h = handlers[ method ] ) {
