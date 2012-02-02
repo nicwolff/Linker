@@ -56,7 +56,7 @@ var http = require('http'),
 
 				console.log( 'DATA: ' + body );
 
-				fs.writeFile( filename, body, 'binary', function (err) {
+				fs.writeFile( filename, body, 'utf8', function (err) {
 					if (err) { console.error( 'Error during write: ' + err ) };
 					console.log( 'Saved file ' + filename );
 				  handlers['GET']( resource, request, response );
