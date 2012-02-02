@@ -210,9 +210,9 @@
 		localStorage.setItem( 'page_height', height );
 		$('#background').css( 'height', height );
 		$('#v-guide').css( 'height', height ).show();
-		$('#h-guide').css( 'width', $('#background').css('width') ).show();
 		setTimeout( function () {
 			var width = $('#background').width() + window.scrollBarWidth();
+			$('#h-guide').css( 'width', width ).show();
 			window.resizeTo( width, window.screen.availHeight );
 			lw.moveTo(width + 1, 0);
 		}, 50 );
