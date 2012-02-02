@@ -1,78 +1,86 @@
-var http = require('http');
-var fs = require('fs');
-var qs = require('querystring');
+var http = require('http'),
+	fs = require('fs'),
+	url = require('url'),
+	qs = require('querystring'),
 
-var path = process.argv[2];
-console.log( 'Looking for files in ' + path );
+	path = process.argv[2],
 
-var handlers = {
-
-	GET: function (resource, request, response) {
-	  console.log('In GET');
-
-		var extension = resource.split('.').pop();
-
-		fs.readFile(
-			path + '/' + resource,
-			function (err, data) {
-			  if ( err ) {
-			    console.error("Could not open file: %s", err);
-					response.writeHead(404, 'File not found');
-				  response.end();
-			  }
-				response.writeHead( 200, { 'Content-Type': contentTypes[extension] } );
-			  response.end( data );
-		} );
-
+	contentTypes = {
+	    html: 'text/html',
+	    js:   'text/javascript',
+	    jpg:   'image/jpeg',
+			plist:'text/xml'
 	},
 
-	PUT: function (resource, request, response) {
-	  console.log('In PUT');
+	handlers = {
 
-		var body = '';
+		GET: function (resource, request, response) {
 
-		request.on('data', function (data) { body += data } );
+			if ( resource == '/' ) resource = '/linker.html';
+			var extension = resource.split('.').pop();
+			var filename = path + resource;
+			console.log( 'GET ' + filename );
 
-		request.on('end', function () {
-			var data = qs.parse(body);
-			fs.writeFile( path + '/' + resource, data, 'utf8', function (err) {
-				if (err) throw err;
-				console.log('It\'s saved!');
+			fs.stat( filename, function (error, stat) {
+				if (error) {
+					response.writeHead( 500, 'Error while reading %s: %s'.printf( resource, error ) );
+				  response.end();
+				} else {
+					var filesize = stat.size;
+					if ( resource == '/linker.html' ) {
+						var script = '<script>var path = "%s";</script>\n\n'.printf( path );
+						filesize += script.length;
+					}
+					console.log( 'Sending ' + filesize + ' bytes' );
+					response.writeHead( 200, {
+						'Content-Type': contentTypes[extension] || 'text/plain',
+						'Content-Length': filesize
+					} );
+					if ( script ) response.write( script );
+					fs.createReadStream( filename )
+						.on( 'error', function (err) { console.error(err) } )
+						.pipe( response );
+				}
 			} );
-		  handlers['GET']( resource, request, response );
-		} );
 
-	}
+		},
 
-};
+		PUT: function (resource, request, response) {
+		  console.log('In PUT');
 
-var contentTypes = {
-    html: 'text/html',
-    js:   'text/javascript',
-		plist:'text/xml'
-};
+			var body = '';
+
+			request.on('data', function (data) { body += data } );
+
+			request.on('end', function () {
+				var data = qs.parse(body);
+				fs.writeFile( path + '/' + resource, data, 'utf8', function (err) {
+					if (err) throw err;
+					console.log('It\'s saved!');
+				} );
+			  return handlers['GET']( resource, request, response );
+			} );
+
+		}
+
+	};
+
+console.log( 'Looking for files in ' + path );
 
 String.prototype.printf = function () {
-	var args = arguments;
-	var i = 0;
+	var args = arguments, i = 0;
 	return this.replace( /\%s/g, function () { return args[i++] } );
 }
 
-function send_page_XML (fileExtension) {
-	var contentType = contentTypesByExtension[fileExtension] || 'text/plain';
-}
-
 http.createServer( function (request, response) {
-	console.log('Got request for ' + request.url);
 	var method = request.method.toUpperCase();
-	var pathParts = request.url.split('/');
-	var resource = pathParts[1];
-	console.log('About to route to %s(%s)'.printf(method, resource));
+	var resource = url.parse(request.url).pathname;
+	console.log( 'Routing request for %s to %s(%s)'.printf( request.url, method, resource ) );
 	var h;
 	if ( h = handlers[ method ] ) {
 		h( resource, request, response );
 	} else {
-		response.writeHead(405, 'Method %s not allowed on resource %s'.printf( method, resource));
+		response.writeHead( 405, 'Method %s not allowed on resource %s'.printf( method, resource ) );
 	  response.end();
 	}
 } ).listen(8124);
