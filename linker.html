@@ -262,7 +262,18 @@
 					} );
 				} );
 			},
-			error: function () {
+			error: function(x,e){
+				if(x.status==404){
+					console.error('Requested URL not found.');
+				}else if(x.status==500){
+					console.error('Internal Server Error.');
+				}else if(e=='parsererror'){
+					console.error('Response parsing failed.');
+				}else if(e=='timeout'){
+					console.error('Request Time out.');
+				}else {
+					console.error('Unknown Error.\n'+x.responseText);
+				}
 				if( this.tries++ > 2 ) return;
 				this.url = this.url.replace( /(\d+\.plist)/, '0$&' );
 				$.ajax(this);
