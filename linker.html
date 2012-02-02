@@ -232,10 +232,6 @@
 
 	var xs = new XMLSerializer;
 
-	function rect (r) {
-		return ['rect(', r.top, r.right, r.bottom, r.left, ')'].join(' ');
-	}
-
 	function update_plist (filename) {
 		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1]] + '.plist';
 		$('#filename', ld).text( plistname );
