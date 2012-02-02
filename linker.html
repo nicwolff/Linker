@@ -231,6 +231,7 @@
 	}
 
 	var xs = new XMLSerializer;
+	var plist_xml, dict_array_xml;
 
 	function update_plist (filename) {
 		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1]] + '.plist';
@@ -238,9 +239,12 @@
 		$.ajax( {
 			url: plistname,
 			tries: 0,
+			dataType: 'xml',
 			success: function (xml) {
 				n_links = 0;
-				$(xml).find('array').children().each( function () {
+				plist_xml = xml;
+				dict_array_xml = $(xml).find('array');
+				dict_array_xml.children().each( function () {
 					$('#links', ld).append(
 						$('<div id="link-' + ++n_links + '"></div')
 							.text(
