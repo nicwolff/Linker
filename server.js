@@ -1,7 +1,6 @@
 var http = require('http'),
 	fs = require('fs'),
 	url = require('url'),
-	qs = require('querystring'),
 
 	path = process.argv[2],
 
@@ -28,7 +27,7 @@ var http = require('http'),
 				} else {
 					var filesize = stat.size;
 					if ( resource == '/linker.html' ) {
-						var script = '<script>var path = "%s";</script>\n\n'.printf( path );
+						var script = '<script>var fromServer = true;</script>\n\n';
 						filesize += script.length;
 					}
 					console.log( 'Sending ' + filesize + ' bytes' );
@@ -46,19 +45,22 @@ var http = require('http'),
 		},
 
 		PUT: function (resource, request, response) {
-		  console.log('In PUT');
+
+			var filename = path + resource;
+			console.log( 'PUT' + filename );
 
 			var body = '';
-
-			request.on('data', function (data) { body += data } );
+			request.on('data', function (data) { body += data.toString() } );
 
 			request.on('end', function () {
-				var data = qs.parse(body);
-				fs.writeFile( path + '/' + resource, data, 'utf8', function (err) {
-					if (err) throw err;
-					console.log('It\'s saved!');
+
+				console.log( 'DATA: ' + body );
+
+				fs.writeFile( filename, body, 'binary', function (err) {
+					if (err) { console.error( 'Error during write: ' + err ) };
+					console.log( 'Saved file ' + filename );
+				  handlers['GET']( resource, request, response );
 				} );
-			  return handlers['GET']( resource, request, response );
 			} );
 
 		}
