@@ -76,6 +76,8 @@
 	var mouseY = -1;
 	var linking;
 	var n_links = 0;
+	var changed;
+	var fromServer;
 
 	// EVENTS
 
@@ -99,6 +101,7 @@
 						'</dict>'
 					].join('\n') )
 				);
+			changed = true;
 			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
 			linking.removeClass().addClass('link').css( 'pointer-events', 'auto' );
 			linking = null;
@@ -116,6 +119,7 @@
 			if ( e.altKey ) {
 				$('#' + this.id, ld).remove();
 				$(this).remove();
+				changed = true;
 				if ( linking ) linking.remove();
 				e.stopPropagation();
 			}
@@ -221,7 +225,6 @@
 	function update_image () {
 		localStorage.setItem( 'page_filename', filename );
 		$('#background').prop( 'src', encodeURI('pages/' + filename) );
-		$('#links', ld).empty();
 		$('.link').remove();
 		$('#check', ld).hide();
 		$('#upbox').text( filename );
@@ -234,6 +237,8 @@
 	var plist_xml, dict_array_xml;
 
 	function update_plist (filename) {
+		if ( fromServer && changed ) { save_plist(); changed = false; }
+		$('#links', ld).empty();
 		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1]] + '.plist';
 		$('#filename', ld).text( plistname );
 		$.ajax( {
@@ -252,6 +257,7 @@
 								.replace( /\n\s+/g, '\n\t' )
 								.replace( /\t<dict>/, '<dict>' )
 								.replace( /\t<\/dict>/, '</dict>' )
+								.replace( / xmlns="http:\/\/www.w3.org\/1999\/xhtml"/g, '' )
 							)
 					);
 					$('#check', ld).show(); $('#edit', ld).prop('checked', true);
@@ -281,6 +287,25 @@
 				if( this.tries++ > 2 ) return;
 				this.url = this.url.replace( /(\d+\.plist)/, '0$&' );
 				$.ajax(this);
+			}
+		} );
+	}
+
+	function save_plist () {
+		$(dict_array_xml).empty().append( $( $('#links', ld).text() ) );
+		console.log(plist_xml);
+		$.ajax( {
+			url: '/' + $('#filename', ld).text(),
+			type: 'PUT',
+			data: xs.serializeToString(plist_xml),
+			dataType: 'xml',
+			success: function () {
+				$(this).val('Saved');
+				setTimeout( function () { $(this).val('Save') }, 2000 );
+			},
+			error: function () {
+				$(this).val('ERROR');
+				setTimeout( function () { $(this).val('Save') }, 2000 );
 			}
 		} );
 	}
@@ -320,6 +345,9 @@
 		d.writeln( '<title>Links</title>' );
 		d.writeln( '<div id="filename"></div>' );
 		d.writeln( '<div id="links"></div>' );
+		if ( fromServer ) {
+			d.writeln( '<input type="submit" id="save" value="Save">' );
+		}
 		d.writeln( '<div>' );
 		d.writeln( '	<h2>How to use this</h2>' );
 		d.writeln( '	<p>Put this HTML file in the same directory as the issue plists.</p>' );
@@ -340,6 +368,7 @@
 			},
 			dblclick: function (e) {
 				$(this).css( 'background-color', 'white' ).prop( 'contenteditable', true );
+				changed = true;
 			},
 			keydown: function (e) {
 				if ( e.which == 13 ) {
@@ -351,6 +380,8 @@
 				}
 			}
 		}, 'div' );
+
+		$('#save', d).click( save_plist );
 
 		return win;
 	}
