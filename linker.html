@@ -17,6 +17,9 @@
 		background-color: #fcc; opacity: .5;
 		outline: 1px solid red;
 	}
+	div.selected {
+		background-color: #966;
+	}
 	#upform {
 		position: fixed; clear: both;
 		width: 100%;
@@ -117,6 +120,11 @@
 				changed = true;
 				if ( linking ) linking.remove();
 				e.stopPropagation();
+			} else if ( e.shiftKey ) {
+				$(this).toggleClass('selected');
+			} else {
+				$('.link').removeClass('selected');
+				$(this).addClass('selected');
 			}
 		},
 		mouseenter: function (e) {
@@ -176,13 +184,49 @@
 	} );
 
 	$(document).keydown( function (e) {
-		if (e.keyCode == 37 && e.metaKey) { // left arrow
-			$('#prev').click();
+		if (e.which == 37) { // left arrow
+			if (e.metaKey) { $('#prev').click(); return false; }
+			if (e.shiftKey) {
+				$('.selected').each( function () { $(this).width( $(this).width() - 1 ) } );
+				return false;
+			}
+			$('.selected').each( function () {
+				var lo = $(this).offset(); lo.left--; $(this).offset( lo );
+			} );
+		} else if (e.which == 39) { // right arrow
+			if (e.metaKey) { $('#next').click(); return false; }
+			if (e.shiftKey) {
+				$('.selected').each( function () { $(this).width( $(this).width() + 1 ) } );
+				return false;
+			}
+			$('.selected').each( function () {
+				var lo = $(this).offset(); lo.left++; $(this).offset( lo );
+			} );
+		} else if (e.which == 38) { // up arrow
+			if (e.shiftKey) {
+				$('.selected').each( function () { $(this).height( $(this).height() - 1 ) } );
+				return false;
+			}
+			$('.selected').each( function () {
+				var lo = $(this).offset(); lo.top--; $(this).offset( lo );
+				e.preventDefault();
+			} );
+		} else if (e.which == 40) { // down arrow
+			if (e.shiftKey) {
+				$('.selected').each( function () { $(this).height( $(this).height() + 1 ) } );
+				return false;
+			}
+			$('.selected').each( function () {
+				var lo = $(this).offset(); lo.top++; $(this).offset( lo );
+				e.preventDefault();
+			} );
+		} else if (e.which == 8) { // backspace
+			$('.selected').each( function () {
+				$('#' + this.id, ld).remove();
+				$(this).remove();
+			} );
 			return false;
-		} else if (e.keyCode == 39 && e.metaKey) { // right arrow
-			$('#next').click();
-			return false;
-		} else if (e.keyCode == 27) { // escape
+		} else if (e.which == 27) { // escape
 			if ( linking ) linking.remove();
 			linking = null;
 			return false;
