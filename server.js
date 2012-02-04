@@ -81,7 +81,7 @@ http.createServer( function (request, response) {
 	var method = request.method.toUpperCase();
 	var resource = url.parse(request.url).pathname;
 	if ( resource.match( /\/\.\.\//g ) ) {
-		response.writeHead( 401, 'Not permitted' );
+		response.writeHead( 403, 'Forbidden' );
 		response.end();
 		console.log( 'Illegal request for ' + resource );
 		return;
