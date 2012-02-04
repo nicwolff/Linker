@@ -101,7 +101,8 @@
 				);
 			changed = true;
 			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
-			linking.removeClass().addClass('link').css( 'pointer-events', 'auto' );
+			$('.link').removeClass('selected');
+			linking.removeClass().addClass('link selected').css( 'pointer-events', 'auto' );
 			linking = null;
 		} else {
 			linking = $('<div id="link-' + ++n_links + '" class="linking"></div>').css( {
@@ -439,6 +440,5 @@
 			alert( 'No Replica.plist found. Please put this file in the issue directory.')
 		}
 	} );
-
 
 </script>
