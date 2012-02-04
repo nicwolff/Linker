@@ -181,10 +181,10 @@
 	} );
 
 	$(document).keydown( function (e) {
-		if (e.keyCode == 37) { // left arrow
+		if (e.keyCode == 37 && e.metaKey) { // left arrow
 			$('#prev').click();
 			return false;
-		} else if (e.keyCode == 39) { // right arrow
+		} else if (e.keyCode == 39 && e.metaKey) { // right arrow
 			$('#next').click();
 			return false;
 		} else if (e.keyCode == 27) { // escape
