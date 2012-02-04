@@ -17,7 +17,6 @@
 		background-color: #fcc; opacity: .5;
 		outline: 1px solid red;
 	}
-	#background { height: 1004px; }
 	#upform {
 		position: fixed; clear: both;
 		width: 100%;
@@ -47,10 +46,6 @@
 <title>Linker</title>
 <img id="background">
 <form id="upform">
-	<select id="height">
-		<option value="928px">Height: 928px</option>
-		<option value="1004px" selected="selected">Height: 1004px</option>
-	</select>
 	<div id="upbox">Click or drop file here</div>
 	<input id="upfile" type="file">
 	<input type="submit" id="prev" class="nav" value="< Prev">
@@ -194,10 +189,6 @@
 		}
 	} );
 
-	$('#height').on( 'change', function (e) {
-		set_height( $(this).val() );
-	} );
-
 	// FUNCTIONS
 
 	window.scrollBarWidth = function() {
@@ -210,21 +201,23 @@
 	  return width;
 	}
 
-	function set_height (height) {
-		localStorage.setItem( 'page_height', height );
-		$('#background').css( 'height', height );
-		$('#v-guide').css( 'height', height ).show();
-		setTimeout( function () {
-			$('#h-guide').css( 'width', $('#background').width() ).show();
-			var width = $('#background').width() + window.scrollBarWidth();
-			window.resizeTo( width, window.screen.availHeight );
-			lw.moveTo(width + 1, 0);
-		}, 50 );
-	}
-
 	function update_image () {
 		localStorage.setItem( 'page_filename', filename );
-		$('#background').prop( 'src', encodeURI('pages/' + filename) );
+		$('#background').prop( 'src', encodeURI('pages/' + filename) ).width(768);
+
+		setTimeout( function () {
+			if ( $('#background').height() > 1004 ) {
+				$('#background').height(1004).width('auto');
+			}
+			setTimeout( function () {
+				$('#v-guide').height( $('#background').height() ).show();
+				$('#h-guide').width( $('#background').width() ).show();
+				var window_width = $('#background').width() + window.scrollBarWidth();
+				window.resizeTo( window_width, window.screen.availHeight );
+				lw.moveTo(window_width + 1, 0);
+			}, 50 );
+		}, 50 );
+
 		$('.link').remove();
 		$('#check', ld).hide();
 		$('#upbox').text( filename );
@@ -397,12 +390,6 @@
 			filename = localStorage.getItem( 'page_filename' ) ||
 				pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
 			update_image();
-			var saved_height = localStorage.getItem( 'page_height' ) || '928px';
-			if ( saved_height ) {
-				$('#height').val( saved_height ).change();
-			} else {
-				set_height( $('#background').height() );
-			}
 		},
 		error: function () {
 			alert( 'No Replica.plist found. Please put this file in the issue directory.')
