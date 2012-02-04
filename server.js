@@ -62,7 +62,8 @@ var http = require('http'),
 				fs.writeFile( filename, body, 'utf8', function (err) {
 					if (err) { console.error( 'Error during write: ' + err ) };
 					console.log( 'Saved file ' + filename );
-				  handlers['GET']( resource, request, response );
+					response.writeHead( 202, 'Accepted' );
+					response.end();
 				} );
 			} );
 
