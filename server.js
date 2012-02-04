@@ -15,9 +15,12 @@ var http = require('http'),
 
 		GET: function (resource, request, response) {
 
-			if ( resource == '/' ) resource = '/linker.html';
-			var extension = resource.split('.').pop();
 			var filename = path + resource;
+			if ( resource == '/' ) {
+				resource = 'linker.html';
+				filename = resource;
+			}
+			var extension = resource.split('.').pop();
 			console.log( 'GET ' + filename );
 
 			fs.stat( filename, function (error, stat) {
@@ -26,7 +29,7 @@ var http = require('http'),
 				  response.end();
 				} else {
 					var filesize = stat.size;
-					if ( resource == '/linker.html' ) {
+					if ( resource == 'linker.html' ) {
 						var script = '<script>var fromServer = true;</script>\n\n';
 						filesize += script.length;
 					}
