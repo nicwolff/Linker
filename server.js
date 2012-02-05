@@ -33,7 +33,6 @@ var http = require('http'),
 						var script = '<script>var fromServer = true;</script>\n\n';
 						filesize += script.length;
 					}
-					console.log( 'Sending ' + filesize + ' bytes' );
 					response.writeHead( 200, {
 						'Content-Type': contentTypes[extension] || 'text/plain',
 						'Content-Length': filesize
