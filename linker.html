@@ -186,40 +186,42 @@
 	} );
 
 	$(document).keydown( function (e) {
+		var distance = 1;
+		if (e.altKey) distance = 10;
 		if (e.which == 37) { // left arrow
 			if (e.metaKey) { $('#prev').click(); return false; }
 			if (e.shiftKey) {
-				$('.selected').each( function () { $(this).width( $(this).width() - 1 ) } );
+				$('.selected').each( function () { $(this).width( $(this).width() - distance ) } );
 				return false;
 			}
 			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.left--; $(this).offset( lo );
+				var lo = $(this).offset(); lo.left -= distance; $(this).offset( lo );
 			} );
 		} else if (e.which == 39) { // right arrow
 			if (e.metaKey) { $('#next').click(); return false; }
 			if (e.shiftKey) {
-				$('.selected').each( function () { $(this).width( $(this).width() + 1 ) } );
+				$('.selected').each( function () { $(this).width( $(this).width() + distance ) } );
 				return false;
 			}
 			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.left++; $(this).offset( lo );
+				var lo = $(this).offset(); lo.left += distance; $(this).offset( lo );
 			} );
 		} else if (e.which == 38) { // up arrow
 			if (e.shiftKey) {
-				$('.selected').each( function () { $(this).height( $(this).height() - 1 ) } );
+				$('.selected').each( function () { $(this).height( $(this).height() - distance ) } );
 				return false;
 			}
 			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.top--; $(this).offset( lo );
+				var lo = $(this).offset(); lo.top -= distance; $(this).offset( lo );
 				e.preventDefault();
 			} );
 		} else if (e.which == 40) { // down arrow
 			if (e.shiftKey) {
-				$('.selected').each( function () { $(this).height( $(this).height() + 1 ) } );
+				$('.selected').each( function () { $(this).height( $(this).height() + distance ) } );
 				return false;
 			}
 			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.top++; $(this).offset( lo );
+				var lo = $(this).offset(); lo.top += distance; $(this).offset( lo );
 				e.preventDefault();
 			} );
 		} else if (e.which == 8) { // backspace
