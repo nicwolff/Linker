@@ -38,7 +38,10 @@
 		font-size: 12px;
 	}
 	#upfile { opacity: 0; }
-	#height { float: right; margin-right: 20px; }
+	#url {
+		display: none; float: right;
+		margin-right: 20px; width: 300px;
+	}
 	.guide {
 		position: absolute; background-color: #666;
 		pointer-events: none;
@@ -50,6 +53,7 @@
 <title>Linker</title>
 <img id="background">
 <form id="upform">
+	<input id="url" placeholder="Enter URL or page number here">
 	<div id="upbox">Click or drop file here</div>
 	<input id="upfile" type="file">
 	<input type="submit" id="prev" class="nav" value="< Prev">
@@ -104,6 +108,7 @@
 			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
 			$('.link').removeClass('selected');
 			linking.removeClass().addClass('link selected').css( 'pointer-events', 'auto' );
+			$('#url').show().focus();
 			linking = null;
 		} else {
 			linking = $('<div id="link-' + ++n_links + '" class="linking"></div>').css( {
@@ -127,6 +132,7 @@
 			} else {
 				$('.link').removeClass('selected');
 				$(this).addClass('selected');
+				$('#url').show().focus();
 			}
 		},
 		mouseenter: function (e) {
@@ -233,6 +239,7 @@
 				$(this).remove();
 				changed = true;
 			} );
+			$('#url').hide();
 			return false;
 		} else if (e.which == 27) { // escape
 			if ( linking ) linking.remove();
@@ -240,6 +247,12 @@
 			return false;
 		}
 	} );
+
+	$('#url').keypress(
+		$('.selected').each( function () {
+//			this.id;
+		} )
+	);
 
 	// FUNCTIONS
 
