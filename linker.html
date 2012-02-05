@@ -226,6 +226,7 @@
 			$('.selected').each( function () {
 				$('#' + this.id, ld).remove();
 				$(this).remove();
+				changed = true;
 			} );
 			return false;
 		} else if (e.which == 27) { // escape
