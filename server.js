@@ -25,7 +25,7 @@ var http = require('http'),
 
 			fs.stat( filename, function (error, stat) {
 				if (error) {
-					response.writeHead( 500, 'Error while reading %s: %s'.printf( resource, error ) );
+					response.writeHead( 500, 'Error while reading %s: %s'.sprintf( resource, error ) );
 				  response.end();
 				} else {
 					var filesize = stat.size;
@@ -73,7 +73,7 @@ var http = require('http'),
 
 console.log( 'Looking for files in ' + path );
 
-String.prototype.printf = function () {
+String.prototype.sprintf = function () {
 	var args = arguments, i = 0;
 	return this.replace( /\%s/g, function () { return args[i++] } );
 }
@@ -87,12 +87,12 @@ http.createServer( function (request, response) {
 		console.log( 'Illegal request for ' + resource );
 		return;
 	}
-	console.log( 'Routing request for %s to %s(%s)'.printf( request.url, method, resource ) );
+	console.log( 'Routing request for %s to %s(%s)'.sprintf( request.url, method, resource ) );
 	var h;
 	if ( h = handlers[ method ] ) {
 		h( resource, request, response );
 	} else {
-		response.writeHead( 405, 'Method %s not allowed on resource %s'.printf( method, resource ) );
+		response.writeHead( 405, 'Method %s not allowed on resource %s'.sprintf( method, resource ) );
 	  response.end();
 	}
 } ).listen(8124);
