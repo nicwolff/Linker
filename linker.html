@@ -355,7 +355,6 @@
 
 	function save_plist () {
 		$(dict_array_xml).empty().append( $( $('#links', ld).text() ) );
-		console.log(plist_xml);
 		$.ajax( {
 			url: '/' + $('#filename', ld).text(),
 			type: 'PUT',
