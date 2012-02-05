@@ -360,7 +360,6 @@
 			url: '/' + $('#filename', ld).text(),
 			type: 'PUT',
 			data: xs.serializeToString(plist_xml),
-			dataType: 'xml',
 			error: function (jqXHR, type, error) {
 				console.error('Could not save plist, error type ' + type);
 			}
