@@ -198,38 +198,42 @@
 			if (e.metaKey) { $('#prev').click(); return false; }
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).width( $(this).width() - distance ) } );
-				return false;
+			} else {
+				$('.selected').each( function () {
+					var lo = $(this).offset(); lo.left -= distance; $(this).offset( lo );
+				} );
 			}
-			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.left -= distance; $(this).offset( lo );
-			} );
+			changed = true;
 		} else if (e.which == 39) { // right arrow
 			if (e.metaKey) { $('#next').click(); return false; }
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).width( $(this).width() + distance ) } );
-				return false;
+			} else {
+				$('.selected').each( function () {
+					var lo = $(this).offset(); lo.left += distance; $(this).offset( lo );
+				} );
 			}
-			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.left += distance; $(this).offset( lo );
-			} );
+			changed = true;
 		} else if (e.which == 38) { // up arrow
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).height( $(this).height() - distance ) } );
-				return false;
+			} else {
+				$('.selected').each( function () {
+					var lo = $(this).offset(); lo.top -= distance; $(this).offset( lo );
+					e.preventDefault();
+				} );
 			}
-			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.top -= distance; $(this).offset( lo );
-				e.preventDefault();
-			} );
+			changed = true;
 		} else if (e.which == 40) { // down arrow
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).height( $(this).height() + distance ) } );
-				return false;
+			} else {
+				$('.selected').each( function () {
+					var lo = $(this).offset(); lo.top += distance; $(this).offset( lo );
+					e.preventDefault();
+				} );
 			}
-			$('.selected').each( function () {
-				var lo = $(this).offset(); lo.top += distance; $(this).offset( lo );
-				e.preventDefault();
-			} );
+			changed = true;
 		} else if (e.which == 8) { // backspace
 			if ( $('.selected').length > 1 && ! confirm( 'Are you sure you want to delete those links?' ) ) {
 				return false;
