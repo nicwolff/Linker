@@ -223,6 +223,9 @@
 				e.preventDefault();
 			} );
 		} else if (e.which == 8) { // backspace
+			if ( $('.selected').length > 1 && ! confirm( 'Are you sure you want to delete those links?' ) ) {
+				return false;
+			}
 			$('.selected').each( function () {
 				$('#' + this.id, ld).remove();
 				$(this).remove();
