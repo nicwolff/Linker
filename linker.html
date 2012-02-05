@@ -357,13 +357,8 @@
 			type: 'PUT',
 			data: xs.serializeToString(plist_xml),
 			dataType: 'xml',
-			success: function () {
-				$(this).val('Saved');
-				setTimeout( function () { $(this).val('Save') }, 2000 );
-			},
-			error: function () {
-				$(this).val('ERROR');
-				setTimeout( function () { $(this).val('Save') }, 2000 );
+			error: function (jqXHR, type, error) {
+				console.error('Could not save plist, error type ' + type);
 			}
 		} );
 	}
