@@ -163,13 +163,13 @@
 
 	var filename;
 
-	$('#upfile').on( 'change', function (e) {
+	$('#upfile').change( function (e) {
 		filename = $('#upfile').val();
 		filename = filename.split('\\').pop();
 		update_image(filename);
 	} ).click( function (e) { e.stopPropagation() } );
 
-	$('#prev').on( 'click', function (e) {
+	$('#prev').click( function (e) {
 		var n = filename.match( /(\d+)\.jpg/ )[1];
 		if ( n > 0 ) {
 			filename = filename.replace( /\d+\.jpg/, Number(n) - 1 + '.jpg' );
@@ -178,7 +178,7 @@
 		return false;
 	} );
 
-	$('#next').on( 'click', function (e) {
+	$('#next').click( function (e) {
 		var n = filename.match( /(\d+)\.jpg/ )[1];
 		filename = filename.replace( /\d+\.jpg/, Number(n) + 1 + '.jpg' );
 		update_image();
