@@ -5,10 +5,10 @@ var http = require('http'),
 	path = process.argv[2],
 
 	contentTypes = {
-	    html: 'text/html',
-	    js:   'text/javascript',
+	    html:  'text/html',
+	    js:    'text/javascript',
 	    jpg:   'image/jpeg',
-			plist:'text/xml'
+		plist: 'text/xml'
 	},
 
 	handlers = {
