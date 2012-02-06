@@ -105,7 +105,6 @@
 					].join('\n') )
 				);
 			changed = true;
-			$('#check', ld).show(); $('#edit', ld).prop('checked', true);
 			$('.link').removeClass('selected');
 			linking.removeClass().addClass('link selected').css( 'pointer-events', 'auto' );
 			$('#url').show().focus();
@@ -289,7 +288,6 @@
 		}, 50 );
 
 		$('.link').remove();
-		$('#check', ld).hide();
 		$('#upbox').text( filename );
 		$('.nav').prop('disabled', false);
 		linking = null;
@@ -323,7 +321,6 @@
 								.replace( / xmlns="http:\/\/www.w3.org\/1999\/xhtml"/g, '' )
 							)
 					);
-					$('#check', ld).show(); $('#edit', ld).prop('checked', true);
 					$(this).children().each( function () {
 						var dims = $(this).text();
 						var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
@@ -395,7 +392,6 @@
 		d.writeln( '	}' );
 		d.writeln( '	#links div { margin: 6px; white-space: pre; }' );
 		d.writeln( '	span { width: 150px; }' );
-		d.writeln( '	#check { display: none; }' );
 		d.writeln( '</style>' );
 		d.writeln( '' );
 		d.writeln( '<title>Links</title>' );
