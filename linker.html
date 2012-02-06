@@ -429,12 +429,18 @@
 		}
 		d.writeln( '<div>' );
 		d.writeln( '	<h2>How to use this</h2>' );
-		d.writeln( '	<p>Put this HTML file in the same directory as the issue plists.</p>' );
-		d.writeln( '	<p>First, select an image file with the file upload control in the other window.</p>' );
-		d.writeln( '	<p>Then you can define link areas, clicking first on the top left corner and then the bottom right corner. Shift-click for a page-number. Hold down the option key to turn off the guide snap. Option-click a link area to remove it.</p>' );
-		d.writeln( '	<p>You can double-click the XML links here to edit the coordinates or URLs, then press Enter to see the effect.</p>' );
-		d.writeln( '	<p>When everything looks right, copy the XML text and paste it into the page\'s plist.</p>' );
-		d.writeln( '	<p>Finally you can click the "Next" button (or press the right arrow key) to load the next page.</p>' );
+		if ( ! fromServer ) {
+			d.writeln( '	<p>Put this HTML file in the same directory as the issue plists.</p>' );
+		}
+		d.writeln( '	<p>Define link areas by clicking first on the top left corner and then the bottom right corner. Hold down the option key to turn off the guide snap.</p>' );
+		d.writeln( '	<p>Click another link to select it. You can shift-click to select multiple links. Use the arrow keys to move the selected links around. Hold the shift key to resize instead, and hold the option or Alt key to move or resize by 10px instead of 1px.</p>' );
+		d.writeln( '	<p>When you have links selected, you can edit their URLs, then press Enter to update the XML above.</p>' );
+		if ( fromServer ) {
+			d.writeln( '	<p>When everything looks right, click the "Save" button in this window, or click the "Next" button to save this page and load the next one.</p>' );
+		} else {
+			d.writeln( '	<p>When everything looks right, copy the XML text and paste it into the page\'s plist.</p>' );
+			d.writeln( '	<p>Finally you can click the "Next" button to load the next page.</p>' );
+		}
 		d.writeln( '</div>' );
 		d.close();
 
