@@ -189,9 +189,11 @@
 	} );
 
 	$(document).keydown( function (e) {
-		var distance = 1;
+
+		var distance = 1, moved;
 		if (e.altKey) distance = 10;
-		if (e.which == 37) { // left arrow
+
+		if (e.which == 37) { // Left arrow
 			if (e.metaKey) { $('#prev').click(); return false; }
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).width( $(this).width() - distance ) } );
@@ -200,8 +202,8 @@
 					var lo = $(this).offset(); lo.left -= distance; $(this).offset( lo );
 				} );
 			}
-			changed = true;
-		} else if (e.which == 39) { // right arrow
+			moved = true;
+		} else if (e.which == 39) { // Right arrow
 			if (e.metaKey) { $('#next').click(); return false; }
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).width( $(this).width() + distance ) } );
@@ -210,8 +212,8 @@
 					var lo = $(this).offset(); lo.left += distance; $(this).offset( lo );
 				} );
 			}
-			changed = true;
-		} else if (e.which == 38) { // up arrow
+			moved = true;
+		} else if (e.which == 38) { // Up arrow
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).height( $(this).height() - distance ) } );
 			} else {
@@ -220,8 +222,8 @@
 					e.preventDefault();
 				} );
 			}
-			changed = true;
-		} else if (e.which == 40) { // down arrow
+			moved = true;
+		} else if (e.which == 40) { // Down arrow
 			if (e.shiftKey) {
 				$('.selected').each( function () { $(this).height( $(this).height() + distance ) } );
 			} else {
@@ -230,8 +232,8 @@
 					e.preventDefault();
 				} );
 			}
-			changed = true;
-		} else if (e.which == 8) { // backspace
+			moved = true;
+		} else if (e.which == 8) { // Backspace - delete selected links
 			if ( $(document.activeElement).hasClass('text_input') ) return;
 			if ( $('.selected').length > 1 && ! confirm( 'Are you sure you want to delete those links?' ) ) {
 				return false;
@@ -243,11 +245,25 @@
 			} );
 			$('#url').hide();
 			return false;
-		} else if (e.which == 27) { // escape
+		} else if (e.which == 27) { // Escape key - cancel link drawing
 			if ( linking ) linking.remove();
 			linking = null;
 			return false;
 		}
+
+		if ( moved ) {
+			changed = true;
+			// Update the coordinates in the XML of the selected links
+			$('.selected').each( function () {
+				var link = $(this);
+				var dims = '{{%s,%s},{%s,%s}}'.sprintf(
+					link.offset().left, link.offset().top,
+					link.width(), link.height()
+				);
+				$('#' + this.id + ' .dims', ld).text(dims);
+			} );
+		}
+
 	} );
 
 	$('#url').keydown( function (e) {
