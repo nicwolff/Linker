@@ -91,24 +91,13 @@
 
 	$('#background').click( function (e) {
 		if ( linking ) {
-			var dims = '{{' + linking.offset().left + ',' + linking.offset().top
-			 	+ '},{' + linking.width() + ',' + linking.height() + '}}';
-			var link = '\t<key>url</key>\n\t<string>http://</string>';
-			if ( e.shiftKey ) {
-				link = '\t<key>page-number</key>\n\t<integer>000</integer>';
-			}
-			$('#links', ld)
-				.append( $('<div id="link-' + n_links + '">')
-					.text( [
-						'<dict>',
-						'\t<key>view-type</key>',
-						'\t<string>link</string>',
-						'\t<key>final-coordinates</key>',
-						'\t<string>' + dims + '</string>',
-						link,
-						'</dict>'
-					].join('\n') )
-				);
+			var dims = '{{%s,%s},{%s,%s}}'.sprintf(
+				linking.offset().left, linking.offset().top,
+				linking.width(), linking.height()
+			);
+			var url = 'http://domain.tld';
+			if ( e.shiftKey ) url = '000';
+			$('#links', ld).append( $('<div id="link-' + n_links + '">').html( linkXML(dims, url) ) );
 			changed = true;
 			$('.link').removeClass('selected');
 			linking.removeClass().addClass('link selected').css( 'pointer-events', 'auto' );
@@ -277,6 +266,23 @@
 	  if(!width) width = document.body.offsetWidth - document.body.clientWidth;
 	  document.body.style.overflow = '';
 	  return width;
+	}
+
+	function linkXML (dims, url) {
+		var urlType = 'url', urlElementType = 'string';
+		if ( ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
+		return [
+			'<dict>',
+			'\t<key>view-type</key>',
+			'\t<string>link</string>',
+			'\t<key>final-coordinates</key>',
+			'\t<string>[span class="dims"]%s[/span]</string>',
+			'\t<key>[span class="urlType"]%s[/span]</key>',
+			'\t<[span class="urlElementType"]%s[/span]>[span class="url"]%s[/span]</[span class="urlElementType"]%s[/span]>',
+			'</dict>'
+		].join('\n').replace(/</g, '&lt;').replace(/\[/g, '<').replace(/\]/g, '>').sprintf(
+			dims, urlType, urlElementType, url, urlElementType
+		);
 	}
 
 	function update_image () {
