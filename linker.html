@@ -84,6 +84,11 @@
 
 	// EVENTS
 
+	String.prototype.sprintf = function () {
+		var args = arguments, i = 0;
+		return this.replace( /\%s/g, function () { return args[i++] } );
+	}
+
 	$('#background').click( function (e) {
 		if ( linking ) {
 			var dims = '{{' + linking.offset().left + ',' + linking.offset().top
