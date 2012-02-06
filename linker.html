@@ -250,11 +250,23 @@
 		}
 	} );
 
-	$('#url').keypress(
-		$('.selected').each( function () {
-//			this.id;
-		} )
-	);
+	$('#url').keydown( function (e) {
+		if (e.which == 13) {
+			var url = $(this).val();
+			var urlType = 'url', urlElementType = 'string';
+			if ( ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
+			$('.selected').each( function () {
+				$(this).data( 'url', url );
+				$('#' + this.id + ' .urlType', ld).text(urlType);
+				$('#' + this.id + ' .urlElementType', ld).text(urlElementType);
+				$('#' + this.id + ' .url', ld).text(url);
+			} )
+			$(this).blur();
+			e.preventDefault();
+			changed = true;
+			return false;
+		}
+	} );
 
 	// FUNCTIONS
 
