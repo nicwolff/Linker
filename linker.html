@@ -326,25 +326,25 @@
 				plist_xml = xml;
 				dict_array_xml = $(xml).find('array');
 				dict_array_xml.children().each( function () {
-					$('#links', ld).append(
-						$('<div id="link-' + ++n_links + '"></div')
-							.text(
-								xs.serializeToString(this)
-								.replace( /\n\s+/g, '\n\t' )
-								.replace( /\t<dict>/, '<dict>' )
-								.replace( /\t<\/dict>/, '</dict>' )
-								.replace( / xmlns="http:\/\/www.w3.org\/1999\/xhtml"/g, '' )
-							)
-					);
+					var dims, url;
 					$(this).children().each( function () {
-						var dims = $(this).text();
-						var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-						if ( m ) {
-							var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
-							$('body').append(link);
-							link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+						switch ( $(this).text() ) {
+							case 'final-coordinates':
+								dims = $(this).next().text();
+							case 'url':
+							case 'page-number':
+								url = $(this).next().text();
 						}
 					} );
+					$('#links', ld).append(
+						$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
+					);
+					var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
+					if ( m ) {
+						var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
+						$('body').append(link);
+						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+					}
 				} );
 			},
 			error: function(x,e){
