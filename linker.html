@@ -107,7 +107,7 @@
 			changed = true;
 			$('.link').removeClass('selected');
 			linking.removeClass().addClass('link selected').css( 'pointer-events', 'auto' );
-			$('#url').show().focus();
+			$('#url').val( $(this).data('url') ).show();
 			linking = null;
 		} else {
 			linking = $('<div id="link-' + ++n_links + '" class="linking"></div>').css( {
@@ -131,8 +131,12 @@
 			} else {
 				$('.link').removeClass('selected');
 				$(this).addClass('selected');
-				$('#url').show().focus();
+				$('#url').val( $(this).data('url') ).show();
 			}
+		},
+		dblclick: function () {
+			$(this).addClass('selected');
+			$('#url').val( $(this).data('url') ).show().focus();
 		},
 		mouseenter: function (e) {
 			$('#' + this.id, ld).css( 'color', 'red' );
