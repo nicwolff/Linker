@@ -80,7 +80,9 @@
 	var linking;
 	var n_links = 0;
 	var changed;
-	var fromServer;
+	var reqURL, masterPlist;
+	var pageOffset = 0;
+	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
 
 	// EVENTS
 
@@ -314,8 +316,9 @@
 	}
 
 	function update_image () {
-		localStorage.setItem( 'page_filename', filename );
-		$('#background').prop( 'src', encodeURI('pages/' + filename) ).width(768);
+		localStorage.setItem( reqURL + '.page_filename', filename );
+		var imageDir = masterPlist == 'Replica.plist' ? 'pages/' : 'JPEGS/';
+		$('#background').prop( 'src', encodeURI(imageDir + filename) ).width(768);
 
 		setTimeout( function () {
 			if ( $('#background').height() > 1004 ) {
@@ -341,9 +344,9 @@
 	var plist_xml, dict_array_xml;
 
 	function update_plist (filename) {
-		if ( fromServer && changed ) { save_plist(); changed = false; }
+		if ( reqURL && changed ) { save_plist(); changed = false; }
 		$('#links', ld).empty();
-		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1]] + '.plist';
+		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1 + pageOffset] + '.plist';
 		$('#filename', ld).text( plistname );
 		$.ajax( {
 			url: plistname,
@@ -359,6 +362,7 @@
 						switch ( $(this).text() ) {
 							case 'final-coordinates':
 								dims = $(this).next().text();
+								break;
 							case 'url':
 							case 'page-number':
 								url = $(this).next().text();
@@ -397,7 +401,7 @@
 	function save_plist () {
 		$(dict_array_xml).empty().append( $( $('#links', ld).text() ) );
 		$.ajax( {
-			url: '/' + $('#filename', ld).text(),
+			url: $('#filename', ld).text(),
 			type: 'PUT',
 			data: xs.serializeToString(plist_xml),
 			error: function (jqXHR, type, error) {
@@ -440,18 +444,18 @@
 		d.writeln( '<title>Links</title>' );
 		d.writeln( '<div id="filename"></div>' );
 		d.writeln( '<div id="links"></div>' );
-		if ( fromServer ) {
+		if ( reqURL ) {
 			d.writeln( '<input type="submit" id="save" value="Save">' );
 		}
 		d.writeln( '<div>' );
 		d.writeln( '	<h2>How to use this</h2>' );
-		if ( ! fromServer ) {
+		if ( ! reqURL ) {
 			d.writeln( '	<p>Put this HTML file in the same directory as the issue plists.</p>' );
 		}
 		d.writeln( '	<p>Define link areas by clicking first on the top left corner and then the bottom right corner. Hold down the option key to turn off the guide snap.</p>' );
 		d.writeln( '	<p>Click another link to select it. You can shift-click to select multiple links. Use the arrow keys to move the selected links around. Hold the shift key to resize instead, and hold the option or Alt key to move or resize by 10px instead of 1px.</p>' );
 		d.writeln( '	<p>When you have links selected, you can edit their URLs, then press Enter to update the XML above.</p>' );
-		if ( fromServer ) {
+		if ( reqURL ) {
 			d.writeln( '	<p>When everything looks right, click the "Save" button in this window, or click the "Next" button to save this page and load the next one.</p>' );
 		} else {
 			d.writeln( '	<p>When everything looks right, copy the XML text and paste it into the page\'s plist.</p>' );
@@ -490,17 +494,18 @@
 	// OPEN INITIAL PAGE
 
 	$.ajax( {
-		url: 'Replica.plist',
+		url: masterPlist || 'Replica.plist',
 		success: function (xml) {
 			$(xml).find('array').find('string').each( function (index, page) {
 				pages.push( page.textContent );
 			} );
-			filename = localStorage.getItem( 'page_filename' ) ||
-				pages[0].replace( /\d+$/, function (n) { return --n } ) + '.jpg';
+			console.log(reqURL);
+			filename = localStorage.getItem( reqURL + '.page_filename' ) ||
+				pages[0].replace( /\d+$/, function (n) { return n - pageOffset } ) + '.jpg';
 			update_image();
 		},
 		error: function () {
-			alert( 'No Replica.plist found. Please put this file in the issue directory.')
+			alert( 'No master plist found. Please put this file in the issue directory.')
 		}
 	} );
 
