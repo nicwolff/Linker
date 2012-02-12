@@ -26,7 +26,7 @@ var http = require('http'),
 				return false;
 			}
 
-      var stats = fs.statSync(fullPath);
+			var stats = fs.statSync(fullPath);
 
 			var masterPlist;
 
