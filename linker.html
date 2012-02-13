@@ -351,50 +351,48 @@
 		$.ajax( {
 			url: plistname,
 			tries: 0,
-			dataType: 'xml',
-			success: function (xml) {
-				n_links = 0;
-				plist_xml = xml;
-				dict_array_xml = $(xml).find('array');
-				dict_array_xml.children().each( function () {
-					var dims, url;
-					$(this).children().each( function () {
-						switch ( $(this).text() ) {
-							case 'final-coordinates':
-								dims = $(this).next().text();
-								break;
-							case 'url':
-							case 'page-number':
-								url = $(this).next().text();
-						}
-					} );
-					$('#links', ld).append(
-						$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
-					);
-					var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-					if ( m ) {
-						var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
-						$('body').append(link);
-						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+			dataType: 'xml'
+		} ).success( function (xml) {
+			n_links = 0;
+			plist_xml = xml;
+			dict_array_xml = $(xml).find('array');
+			dict_array_xml.children().each( function () {
+				var dims, url;
+				$(this).children().each( function () {
+					switch ( $(this).text() ) {
+						case 'final-coordinates':
+							dims = $(this).next().text();
+							break;
+						case 'url':
+						case 'page-number':
+							url = $(this).next().text();
 					}
 				} );
-			},
-			error: function(x,e){
-				if(x.status==404){
-					console.error('Requested URL not found.');
-				}else if(x.status==500){
-					console.error('Internal Server Error.');
-				}else if(e=='parsererror'){
-					console.error('Response parsing failed.');
-				}else if(e=='timeout'){
-					console.error('Request Time out.');
-				}else {
-					console.error('Unknown Error.\n'+x.responseText);
+				$('#links', ld).append(
+					$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
+				);
+				var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
+				if ( m ) {
+					var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
+					$('body').append(link);
+					link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
 				}
-				if( this.tries++ > 2 ) return;
-				this.url = this.url.replace( /(\d+\.plist)/, '0$&' );
-				$.ajax(this);
+			} )
+		} ).error( function(x,e){
+			if(x.status==404){
+				console.error('Requested URL not found.');
+			}else if(x.status==500){
+				console.error('Internal Server Error.');
+			}else if(e=='parsererror'){
+				console.error('Response parsing failed.');
+			}else if(e=='timeout'){
+				console.error('Request Time out.');
+			}else {
+				console.error('Unknown Error.\n'+x.responseText);
 			}
+			if( this.tries++ > 2 ) return;
+			this.url = this.url.replace( /(\d+\.plist)/, '0$&' );
+			$.ajax(this);
 		} );
 	}
 
@@ -403,10 +401,9 @@
 		$.ajax( {
 			url: $('#filename', ld).text(),
 			type: 'PUT',
-			data: xs.serializeToString(plist_xml),
-			error: function (jqXHR, type, error) {
-				console.error('Could not save plist, error type ' + type);
-			}
+			data: xs.serializeToString(plist_xml)
+		} ).error( function (jqXHR, type, error) {
+			console.error('Could not save plist, error type ' + type);
 		} );
 	}
 
@@ -494,19 +491,17 @@
 	// OPEN INITIAL PAGE
 
 	$.ajax( {
-		url: masterPlist || 'Replica.plist',
-		success: function (xml) {
-			$(xml).find('array').find('string').each( function (index, page) {
-				pages.push( page.textContent );
-			} );
-			console.log(reqURL);
-			filename = localStorage.getItem( reqURL + '.page_filename' ) ||
-				pages[0].replace( /\d+$/, function (n) { return n - pageOffset } ) + '.jpg';
-			update_image();
-		},
-		error: function () {
-			alert( 'No master plist found. Please put this file in the issue directory.')
-		}
+			url: masterPlist || 'Replica.plist'
+	} ).success( function (xml) {
+		$(xml).find('array').find('string').each( function (index, page) {
+			pages.push( page.textContent );
+		} );
+		console.log(reqURL);
+		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
+			pages[0].replace( /\d+$/, function (n) { return n - pageOffset } ) + '.jpg';
+		update_image();
+	} ).error( function () {
+		alert( 'No master plist found. Please put this file in the issue directory.')
 	} );
 
 </script>
