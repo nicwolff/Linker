@@ -89,11 +89,11 @@ var http = require('http'),
 
 			request.on('end', function () {
 
-				console.log( 'DATA: ' + body );
+				// console.log( 'DATA: ' + body );
 
 				fs.writeFile( fullPath, body, 'utf8', function (err) {
 					if (err) { console.error( 'Error during write: ' + err ) };
-					console.log( 'Saved file ' + fullPath );
+					console.log( 'Saved %s bytes to %s', body.length, fullPath );
 					response.writeHead( 202, 'Accepted' );
 					response.end();
 				} );
@@ -119,7 +119,7 @@ http.createServer( function (request, response) {
 		console.error( 'Illegal request for ' + resource );
 		return;
 	}
-	console.log( 'Routing request for %s to %s(%s)'.sprintf( request.url, method, resource ) );
+	// console.log( 'Routing request for %s to %s(%s)'.sprintf( request.url, method, resource ) );
 	var h;
 	if ( h = handlers[ method ] ) {
 		h( resource, request, response );
