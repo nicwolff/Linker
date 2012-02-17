@@ -5,7 +5,7 @@ Put the linker.html file in the issue directory with the plist files and open it
 
 Or, run the server with
 
-    node server.js <path to issue directory>
+    node server.js <path to directory containing issue directories>
 
 and visit http://localhost:8124/
 
