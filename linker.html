@@ -83,7 +83,9 @@
 	var changed;
 	var reqURL, masterPlist;
 	var pageOffset = 0;
+	if ( ! masterPlist ) masterPlist = 'Replica.plist';
 	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
+	if ( ! reqURL ) reqURL = window.location;
 
 	// EVENTS
 
