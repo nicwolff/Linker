@@ -137,6 +137,7 @@
 		},
 		mouseenter: function (e) {
 			$('#' + this.id, ld).css( 'color', 'red' );
+			$('body', ld).scrollTop($('#' + this.id, ld).offset().top - 200);
 		},
 		mouseleave: function (e) {
 			$('#' + this.id, ld).css( 'color', 'black' );
