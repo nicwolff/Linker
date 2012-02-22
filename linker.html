@@ -40,7 +40,7 @@
 	#upfile { opacity: 0; }
 	#url {
 		display: none; float: right;
-		margin-right: 20px; width: 300px;
+		margin-right: 20px; width: 250px;
 	}
 	.guide {
 		position: absolute; background-color: #666;
@@ -58,6 +58,8 @@
 	<input id="upfile" type="file">
 	<input type="submit" id="prev" class="nav" value="< Prev">
 	<input type="submit" id="next" class="nav" value="Next >">
+	<input type="text" id="goToImg" style="width:40px;" placeholder="goto">
+	<input type="submit" id="clearCache" value="Refresh">
 </form>
 <div id="v-guide" class="guide"></div>
 <div id="h-guide" class="guide"></div>
@@ -82,7 +84,9 @@
 	var changed;
 	var reqURL, masterPlist;
 	var pageOffset = 0;
+	if ( ! masterPlist ) masterPlist = 'Replica.plist';
 	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
+	if ( ! reqURL ) reqURL = window.location;
 
 	// EVENTS
 
@@ -94,8 +98,8 @@
 	$('#background').click( function (e) {
 		if ( linking ) {
 			var dims = '{{%s,%s},{%s,%s}}'.sprintf(
-				linking.offset().left, linking.offset().top,
-				linking.width(), linking.height()
+				Math.round(linking.offset().left), Math.round(linking.offset().top),
+				Math.round(linking.width()), Math.round(linking.height())
 			);
 			var url = 'http://domain.tld';
 			if ( e.shiftKey ) url = '000';
@@ -136,6 +140,7 @@
 		},
 		mouseenter: function (e) {
 			$('#' + this.id, ld).css( 'color', 'red' );
+			$('body', ld).scrollTop($('#' + this.id, ld).offset().top - 200);
 		},
 		mouseleave: function (e) {
 			$('#' + this.id, ld).css( 'color', 'black' );
@@ -189,6 +194,20 @@
 		update_image();
 		return false;
 	} );
+
+    $('#clearCache').click( function (e) {
+        localStorage.setItem( 'page_filename', '')
+        refresh();
+        return false;
+    } );
+
+    $('#goToImg').keydown( function (e) {
+        if ( e.which == 13 ) {
+            filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
+            update_image();
+            return false;
+        }
+    } );
 
 	$(document).keydown( function (e) {
 
@@ -259,8 +278,8 @@
 			$('.selected').each( function () {
 				var link = $(this);
 				var dims = '{{%s,%s},{%s,%s}}'.sprintf(
-					link.offset().left, link.offset().top,
-					link.width(), link.height()
+					Math.round(link.offset().left), Math.round(link.offset().top),
+					Math.round(link.width()), Math.round(link.height())
 				);
 				$('#' + this.id + ' .dims', ld).text(dims);
 			} );
@@ -329,7 +348,6 @@
 				$('#h-guide').width( $('#background').width() ).show();
 				var window_width = $('#background').width() + window.scrollBarWidth();
 				window.resizeTo( window_width, window.screen.availHeight );
-				lw.moveTo(window_width + 1, 0);
 			}, 50 );
 		}, 50 );
 
@@ -411,9 +429,8 @@
 
 		var win = window.open(
 			'', 'links_window',
-			'location=0,status=0,scrollbars=1,width=400,height=800'
+			'location=0,status=0,scrollbars=1,left=840,width=400,height=800'
 		);
-
 		var d = win.document;
 
 		d.writeln( '<style type="text/css" media="screen">' );
