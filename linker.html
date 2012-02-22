@@ -95,8 +95,8 @@
 	$('#background').click( function (e) {
 		if ( linking ) {
 			var dims = '{{%s,%s},{%s,%s}}'.sprintf(
-				linking.offset().left, linking.offset().top,
-				linking.width(), linking.height()
+				Math.round(linking.offset().left), Math.round(linking.offset().top),
+				Math.round(linking.width()), Math.round(linking.height())
 			);
 			var url = 'http://domain.tld';
 			if ( e.shiftKey ) url = '000';
@@ -268,8 +268,8 @@
 			$('.selected').each( function () {
 				var link = $(this);
 				var dims = '{{%s,%s},{%s,%s}}'.sprintf(
-					link.offset().left, link.offset().top,
-					link.width(), link.height()
+					Math.round(link.offset().left), Math.round(link.offset().top),
+					Math.round(link.width()), Math.round(link.height())
 				);
 				$('#' + this.id + ' .dims', ld).text(dims);
 			} );
