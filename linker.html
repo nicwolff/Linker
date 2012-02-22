@@ -339,7 +339,6 @@
 				$('#h-guide').width( $('#background').width() ).show();
 				var window_width = $('#background').width() + window.scrollBarWidth();
 				window.resizeTo( window_width, window.screen.availHeight );
-				lw.moveTo(window_width + 1, 0);
 			}, 50 );
 		}, 50 );
 
@@ -421,9 +420,8 @@
 
 		var win = window.open(
 			'', 'links_window',
-			'location=0,status=0,scrollbars=1,width=400,height=800'
+			'location=0,status=0,scrollbars=1,left=840,width=400,height=800'
 		);
-
 		var d = win.document;
 
 		d.writeln( '<style type="text/css" media="screen">' );
