@@ -59,6 +59,7 @@
 	<input type="submit" id="prev" class="nav" value="< Prev">
 	<input type="submit" id="next" class="nav" value="Next >">
 	<input type="text" id="goToImg" style="width:40px;" placeholder="goto">
+	<input type="submit" id="clearCache" value="Refresh">
 </form>
 <div id="v-guide" class="guide"></div>
 <div id="h-guide" class="guide"></div>
@@ -193,6 +194,12 @@
 		update_image();
 		return false;
 	} );
+
+    $('#clearCache').click( function (e) {
+        localStorage.setItem( 'page_filename', '')
+        refresh();
+        return false;
+    } );
 
     $('#goToImg').keydown( function (e) {
         if ( e.which == 13 ) {
