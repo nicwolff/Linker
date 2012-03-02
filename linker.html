@@ -195,19 +195,19 @@
 		return false;
 	} );
 
-    $('#clearCache').click( function (e) {
-        localStorage.setItem( 'page_filename', '')
-        refresh();
-        return false;
-    } );
+	$('#clearCache').click( function (e) {
+		localStorage.setItem( 'page_filename', '')
+		refresh();
+		return false;
+	} );
 
-    $('#goToImg').keydown( function (e) {
-        if ( e.which == 13 ) {
-            filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
-            update_image();
-            return false;
-        }
-    } );
+	$('#goToImg').keydown( function (e) {
+		if ( e.which == 13 ) {
+			filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
+			update_image();
+			return false;
+		}
+	} );
 
 	$(document).keydown( function (e) {
 
