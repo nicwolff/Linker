@@ -6,9 +6,9 @@ var http = require('http'),
 	rootPath = process.argv[2],
 
 	contentTypes = {
-	    html:  'text/html',
-	    js:    'text/javascript',
-	    jpg:   'image/jpeg',
+		html:  'text/html',
+		js:    'text/javascript',
+		jpg:   'image/jpeg',
 		plist: 'text/xml'
 	},
 
