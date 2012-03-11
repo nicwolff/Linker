@@ -318,7 +318,7 @@
 
 	function linkXML (dims, url) {
 		var urlType = 'url', urlElementType = 'string';
-		if ( ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
+		if ( url && ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
 		return [
 			'<dict>',
 			'\t<key>view-type</key>',
