@@ -85,7 +85,6 @@
 	var reqURL, masterPlist;
 	var pageOffset = 0;
 	if ( ! masterPlist ) masterPlist = 'Replica.plist';
-	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
 	if ( ! reqURL ) reqURL = window.location;
 
 	// EVENTS
@@ -336,7 +335,7 @@
 
 	function update_image () {
 		localStorage.setItem( reqURL + '.page_filename', filename );
-		var imageDir = masterPlist == 'Replica.plist' ? 'pages/' : 'JPEGS/';
+		var imageDir = 'JPEGS/';
 		$('#background').prop( 'src', encodeURI(imageDir + filename) ).width(768);
 
 		setTimeout( function () {
@@ -508,7 +507,7 @@
 	// OPEN INITIAL PAGE
 
 	$.ajax( {
-		url: masterPlist || 'Replica.plist'
+		url: 'Replica.plist'
 	} ).success( function (xml) {
 		$(xml).find('array').find('string').each( function (index, page) {
 			pages.push( page.textContent );
