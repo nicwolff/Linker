@@ -363,7 +363,7 @@
 	function update_plist (filename) {
 		if ( reqURL && changed ) { save_plist(); changed = false; }
 		$('#links', ld).empty();
-		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1 + pageOffset] + '.plist';
+		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1] + '.plist';
 		$('#filename', ld).text( plistname );
 		$.ajax( {
 			url: plistname,
@@ -512,9 +512,8 @@
 		$(xml).find('array').find('string').each( function (index, page) {
 			pages.push( page.textContent );
 		} );
-		console.log(reqURL);
 		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
-			pages[0].replace( /\d+$/, function (n) { return n - pageOffset } ) + '.jpg';
+			pages[0].replace( /\d+$/, function (n) { return Number(n) } ) + '.jpg';
 		update_image();
 	} ).error( function () {
 		alert( 'No master plist found. Please put this file in the issue directory.')
