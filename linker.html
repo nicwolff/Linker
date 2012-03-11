@@ -374,9 +374,12 @@
 			plist_xml = xml;
 			dict_array_xml = $(xml).find('array');
 			dict_array_xml.children().each( function () {
-				var dims, url;
+				var type, dims, url;
 				$(this).children().each( function () {
 					switch ( $(this).text() ) {
+						case 'view-type':
+							type = $(this).next().text();
+							break;
 						case 'final-coordinates':
 							dims = $(this).next().text();
 							break;
@@ -385,14 +388,17 @@
 							url = $(this).next().text();
 					}
 				} );
-				$('#links', ld).append(
-					$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
-				);
-				var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-				if ( m ) {
-					var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
-					$('body').append(link);
-					link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+				if ( type == 'link' ) {
+					$(this).remove();
+					$('#links', ld).append(
+						$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
+					);
+					var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
+					if ( m ) {
+						var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
+						$('body').append(link);
+						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+					}
 				}
 			} )
 		} ).error( function(x,e){
@@ -414,7 +420,7 @@
 	}
 
 	function save_plist () {
-		$(dict_array_xml).empty().append( $( $('#links', ld).text() ) );
+		$(dict_array_xml).append( $( $('#links', ld).text() ) );
 		$.ajax( {
 			url: $('#filename', ld).text(),
 			type: 'PUT',
