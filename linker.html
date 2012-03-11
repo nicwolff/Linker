@@ -397,7 +397,7 @@
 			} )
 		} ).error( function(x,e){
 			if ( x.status == 404 ) {
-				console.error('Requested URL not found.');
+				console.error('Requested URL %s not found.', this.url);
 			} else if ( x.status == 500 ) {
 				console.error('Internal Server Error.');
 			} else if ( e == 'parsererror' ) {
