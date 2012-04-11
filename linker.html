@@ -85,7 +85,6 @@
 	var reqURL, masterPlist;
 	var pageOffset = 0;
 	if ( ! masterPlist ) masterPlist = 'Replica.plist';
-	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
 	if ( ! reqURL ) reqURL = window.location;
 
 	// EVENTS
@@ -196,8 +195,8 @@
 	} );
 
 	$('#clearCache').click( function (e) {
-		localStorage.setItem( 'page_filename', '')
-		refresh();
+		localStorage.remove( reqURL + '.page_filename' )
+		window.reload();
 		return false;
 	} );
 
@@ -319,7 +318,7 @@
 
 	function linkXML (dims, url) {
 		var urlType = 'url', urlElementType = 'string';
-		if ( ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
+		if ( url && ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
 		return [
 			'<dict>',
 			'\t<key>view-type</key>',
@@ -364,7 +363,7 @@
 	function update_plist (filename) {
 		if ( reqURL && changed ) { save_plist(); changed = false; }
 		$('#links', ld).empty();
-		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1 + pageOffset] + '.plist';
+		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1] + '.plist';
 		$('#filename', ld).text( plistname );
 		$.ajax( {
 			url: plistname,
@@ -375,9 +374,12 @@
 			plist_xml = xml;
 			dict_array_xml = $(xml).find('array');
 			dict_array_xml.children().each( function () {
-				var dims, url;
+				var type, dims, url;
 				$(this).children().each( function () {
 					switch ( $(this).text() ) {
+						case 'view-type':
+							type = $(this).next().text();
+							break;
 						case 'final-coordinates':
 							dims = $(this).next().text();
 							break;
@@ -386,19 +388,22 @@
 							url = $(this).next().text();
 					}
 				} );
-				$('#links', ld).append(
-					$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
-				);
-				var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-				if ( m ) {
-					var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
-					$('body').append(link);
-					link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+				if ( type == 'link' ) {
+					$(this).remove();
+					$('#links', ld).append(
+						$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
+					);
+					var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
+					if ( m ) {
+						var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
+						$('body').append(link);
+						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+					}
 				}
 			} )
 		} ).error( function(x,e){
 			if ( x.status == 404 ) {
-				console.error('Requested URL not found.');
+				console.error('Requested URL %s not found.', this.url);
 			} else if ( x.status == 500 ) {
 				console.error('Internal Server Error.');
 			} else if ( e == 'parsererror' ) {
@@ -415,7 +420,7 @@
 	}
 
 	function save_plist () {
-		$(dict_array_xml).empty().append( $( $('#links', ld).text() ) );
+		$(dict_array_xml).append( $( $('#links', ld).text() ) );
 		$.ajax( {
 			url: $('#filename', ld).text(),
 			type: 'PUT',
@@ -508,14 +513,13 @@
 	// OPEN INITIAL PAGE
 
 	$.ajax( {
-		url: masterPlist || 'Replica.plist'
+		url: 'Replica.plist'
 	} ).success( function (xml) {
 		$(xml).find('array').find('string').each( function (index, page) {
 			pages.push( page.textContent );
 		} );
-		console.log(reqURL);
 		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
-			pages[0].replace( /\d+$/, function (n) { return n - pageOffset } ) + '.jpg';
+			pages[0].replace( /\d+$/, function (n) { return Number(n) } ) + '.jpg';
 		update_image();
 	} ).error( function () {
 		alert( 'No master plist found. Please put this file in the issue directory.')
