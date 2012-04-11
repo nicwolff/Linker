@@ -336,7 +336,7 @@
 
 	function update_image () {
 		localStorage.setItem( reqURL + '.page_filename', filename );
-		var imageDir = masterPlist == 'Replica.plist' ? 'pages/' : 'JPEGS/';
+		var imageDir = 'JPEGS/';
 		$('#background').prop( 'src', encodeURI(imageDir + filename) ).width(768);
 
 		setTimeout( function () {
