@@ -45,9 +45,20 @@
 	.guide {
 		position: absolute; background-color: #666;
 		pointer-events: none;
+		z-index: 11;
 	}
 	#v-guide { width: 1px; height: 2000px; top: 0; }
 	#h-guide { width: 2000px; height: 1px; left: 0; }
+	#notification {
+		background-color: yellow;
+		outline: 1px solid red;
+		width: 400px;
+		heigh: 40px;
+		margin: 0 24px;
+	}
+	
+	.hotspot {z-index: 10;background: #B0B4FF}
+	.closeButton{z-index:50}
 </style>
 
 <title>Linker</title>
@@ -60,6 +71,7 @@
 	<input type="submit" id="next" class="nav" value="Next >">
 	<input type="text" id="goToImg" style="width:40px;" placeholder="goto">
 	<input type="submit" id="clearCache" value="Refresh">
+	<label id="notification"></label>
 </form>
 <div id="v-guide" class="guide"></div>
 <div id="h-guide" class="guide"></div>
@@ -75,18 +87,21 @@
 	var lw = open_links_window();
 	var ld = lw.document;
 	self.focus();
-
+	
+	var n_scrollable = 0;
+	
 	var pages = [];
 	var mouseX = -1;
 	var mouseY = -1;
 	var linking;
-	var n_links = 0;
+	var n_links = 0;	
 	var changed;
 	var reqURL, masterPlist;
 	var pageOffset = 0;
 	if ( ! masterPlist ) masterPlist = 'Replica.plist';
+	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
 	if ( ! reqURL ) reqURL = window.location;
-
+	var imageDir = masterPlist == 'Replica.plist' ? 'pages/' : 'JPEGS/';
 	// EVENTS
 
 	String.prototype.sprintf = function () {
@@ -194,19 +209,19 @@
 		return false;
 	} );
 
-	$('#clearCache').click( function (e) {
-		localStorage.remove( reqURL + '.page_filename' )
-		window.reload();
-		return false;
-	} );
+    $('#clearCache').click( function (e) {
+        localStorage.setItem( reqURL + '.page_filename', '')
+        refresh();
+        return false;
+    } );
 
-	$('#goToImg').keydown( function (e) {
-		if ( e.which == 13 ) {
-			filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
-			update_image();
-			return false;
-		}
-	} );
+    $('#goToImg').keydown( function (e) {
+        if ( e.which == 13 ) {
+            filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
+            update_image();
+            return false;
+        }
+    } );
 
 	$(document).keydown( function (e) {
 
@@ -318,7 +333,7 @@
 
 	function linkXML (dims, url) {
 		var urlType = 'url', urlElementType = 'string';
-		if ( url && ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
+		if ( ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
 		return [
 			'<dict>',
 			'\t<key>view-type</key>',
@@ -332,10 +347,28 @@
 			dims, urlType, urlElementType, url, urlElementType
 		);
 	}
+	
+	function linkXMLSubPageNumber (url, subPageNumber) {
+		var urlType = 'url', urlElementType = 'string';
+		if ( ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
+		return [
+			'<dict>',
+			'\t<key>view-type</key>',
+			'\t<string>link</string>',
+			'\t<key>page-number</key>',
+			'\t<integer>[span class="url"]%s[/span]</integer>',
+			'\t<key>sub-page-number</key>',
+			'\t<integer>[span class="subPageNumber"]%s[/span]</integer>',
+			'</dict>'
+		].join('\n').replace(/</g, '&lt;').replace(/\[/g, '<').replace(/\]/g, '>').sprintf(
+			url, subPageNumber
+		);
+	}
 
 	function update_image () {
+		$('#notification').text('');
 		localStorage.setItem( reqURL + '.page_filename', filename );
-		var imageDir = 'JPEGS/';
+		
 		$('#background').prop( 'src', encodeURI(imageDir + filename) ).width(768);
 
 		setTimeout( function () {
@@ -349,7 +382,15 @@
 				window.resizeTo( window_width, window.screen.availHeight );
 			}, 50 );
 		}, 50 );
-
+		
+		//Remove all scrollable at the root window
+		$('.scrollable').remove();
+		
+		//Remove all popup at the root window
+		$(".hotspot").remove();
+		$(".popup").remove();
+		$(".popup-hotspot").remove();
+		
 		$('.link').remove();
 		$('#upbox').text( filename );
 		$('.nav').prop('disabled', false);
@@ -363,7 +404,23 @@
 	function update_plist (filename) {
 		if ( reqURL && changed ) { save_plist(); changed = false; }
 		$('#links', ld).empty();
-		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1] + '.plist';
+		
+		//Remove all scrollable links at the popup window
+		$('.scrollableLinks ', ld).remove();
+		
+		//Remove all popup links at the popup window
+		$('.popupLinks', ld).remove();
+		
+		//Remove all header of links at the popup window
+		$('h3', ld).remove();
+		
+		//number of hotspot
+		var n_hotspot = 0; 
+		
+		//number of scrollable
+		
+		
+		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1 + pageOffset] + '.plist';
 		$('#filename', ld).text( plistname );
 		$.ajax( {
 			url: plistname,
@@ -371,39 +428,112 @@
 			dataType: 'xml'
 		} ).success( function (xml) {
 			n_links = 0;
-			plist_xml = xml;
-			dict_array_xml = $(xml).find('array');
+			plist_xml = xml;			
+			
+			//dict_array_xml = $(xml).find('array');
+			dict_array_xml = $('plist > dict > array', xml);
 			dict_array_xml.children().each( function () {
-				var type, dims, url;
+				var dims, url;
+				var subPageNumber = '';
+				
+				//Content coordinates
+				var dimsContent;
+				
+				//Hotspot's Variable 
+				var autoPopup = 'false'; //check autoPopup of hotspot is true/false
+				var imageName; //Get image name 
+				var dimsClose; //Get coordinates of the close button
+				
+				var isHotpot = false;
 				$(this).children().each( function () {
 					switch ( $(this).text() ) {
+						case 'sub-page-number':
+							subPageNumber = $(this).next().text();
+							break;
+					
 						case 'view-type':
-							type = $(this).next().text();
+							if($(this).next().text() != 'link'){
+								isHotpot = true;
+								$('#notification').text('This is "' + $(this).next().text() + '" page.');
+							}
 							break;
 						case 'final-coordinates':
 							dims = $(this).next().text();
 							break;
+							
+						//Get content coordinates 
+						case 'content-coordinates':
+							dimsContent = $(this).next().text();
+							break;
+						
 						case 'url':
 						case 'page-number':
 							url = $(this).next().text();
+							break;
+						
+						//Check AutoPopup field
+						case 'auto-popup':
+							autoPopup = $(this).next()[0].nodeName;
+							break;
+						
+						//Get image name
+						case 'image-name':
+							imageName = $(this).next().text();
+							break;
+						
+						//Get coordinates of the close button
+						case 'close-button':
+							$(this).next().children().each(function(){
+								switch ( $(this).text() ) {
+									case 'final-coordinates':
+										dimsClose = $(this).next().text();
+								}
+							})
+							break;
+						
+						//Popup page
+						case 'reveals':
+							var m = dims.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+							var hotspot = $('<div id="hotspot'+ ++n_hotspot + '" class="hotspot" />');
+
+							$('#links', ld).before('<h3>Hotspot '+ n_hotspot + '</h3>').before(
+								$('<div id="link-popup-hotspot'+ n_hotspot +'" class="popupLinks"></div').html("")
+							);
+							
+							$('body').append(hotspot);
+							hotspot.css( { left: m[1], top: m[2], width: m[3], height: m[4], position: 'absolute', opacity: '0.5' } )
+								.bind('click', showPopUp);
+								
+							$('#link-popup-hotspot'+ n_hotspot, ld).on( objHandlerOnLinkEvent, 'div' );
+								
+							displayPopupHotspot($(this), dimsClose, autoPopup, n_hotspot, imageDir);							
+							break;
+						
+						//Scrollable Page
+						case 'scroll-objects':
+							displayScrollable($(this), dims, dimsContent, "")
+							break;
 					}
 				} );
-				if ( type == 'link' ) {
-					$(this).remove();
-					$('#links', ld).append(
-						$('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) )
-					);
-					var m = dims.match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-					if ( m ) {
-						var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
-						$('body').append(link);
-						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+				if(!isHotpot){
+					if(subPageNumber != '')
+						$('#links', ld).append($('<div id="link-' + ++n_links + '"></div').html( linkXMLSubPageNumber( url, subPageNumber ) ));
+					else
+					{
+						$('#links', ld).append($('<div id="link-' + ++n_links + '"></div').html( linkXML( dims, url ) ));
+						var m = dims.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+						if ( m ) {
+							var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
+							$('body').append(link);
+							link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+						}
 					}
+					
 				}
 			} )
 		} ).error( function(x,e){
 			if ( x.status == 404 ) {
-				console.error('Requested URL %s not found.', this.url);
+				console.error('Requested URL not found.');
 			} else if ( x.status == 500 ) {
 				console.error('Internal Server Error.');
 			} else if ( e == 'parsererror' ) {
@@ -420,7 +550,117 @@
 	}
 
 	function save_plist () {
-		$(dict_array_xml).append( $( $('#links', ld).text() ) );
+		// check if hotpot, not save
+		var hotpotObject = [];
+		var isHotPot = false;
+		var n_hot = 0;
+		var n_saveScrollable = 0;
+		
+		
+		dict_array_xml.children().each( function () {
+				$(this).children().each( function () {
+					switch ( $(this).text() ) {
+						case 'view-type':
+							if($(this).next().text() != 'link'){
+								isHotPot = true;
+								
+								//Save Scrollable Links
+								if($(this).next().text() == 'scrollarea')
+								{	
+									var hotpotObjectScrollable = [];
+									var isHotPotScrollable = false;
+									 $(this).parent().children('array').children().each(function(){
+										$(this).children().each( function () {
+											switch ( $(this).text() ) {
+												case 'view-type':
+													if($(this).next().text() != 'link'){
+														isHotPotScrollable = true;
+														hotpotObjectScrollable.push($(this).parent()[0]);
+													}
+											}
+										})
+									})
+									n_saveScrollable = n_saveScrollable + 1;
+									if(isHotPotScrollable) {
+										 $(this).parent().children('array').empty().append( $( $('#scrollable'+n_saveScrollable+'', ld).text() ), hotpotObjectScrollable);
+									} else {
+										 $(this).parent().children('array').empty().append( $( $('#scrollable'+n_saveScrollable+'', ld).text() ) );
+									}
+								}
+								//End Save Scrollable Links
+								
+								//Save PopUp Links
+								if($(this).next().text() == 'hotspot')
+								{	
+									var hotpotObjectPopup = [];
+									var isHotPotPopup = false;
+									$(this).parent().children('array').children().each(function(){
+										$(this).children().each( function () {
+											switch ( $(this).text() ) {
+												case 'view-type':													
+													if($(this).next().text() != 'link' && $(this).next().text() != 'scrollarea'){
+														isHotPotPopup = true;
+														hotpotObjectPopup.push($(this).parent()[0]);
+													}
+													
+													//Save Scrollable Links
+													if($(this).next().text() == 'scrollarea')
+													{	
+														var hotpotObjectScrollable = [];
+														var isHotPotScrollable = false;
+														 $(this).parent().children('array').children().each(function(){
+															$(this).children().each( function () {
+																switch ( $(this).text() ) {
+																	case 'view-type':
+																		if($(this).next().text() != 'link'){
+																			isHotPotScrollable = true;
+																			hotpotObjectScrollable.push($(this).parent()[0]);
+																		}
+																}
+															})
+														})
+														n_saveScrollable = n_saveScrollable + 1;
+														if(isHotPotScrollable) {
+															 $(this).parent().children('array').empty().append( $( $('#scrollable'+n_saveScrollable+'', ld).text() ), hotpotObjectScrollable);
+															 hotpotObjectPopup.push($(this).parent()[0]);
+														} else {
+															 $(this).parent().children('array').empty().append( $( $('#scrollable'+n_saveScrollable+'', ld).text() ) );
+															 hotpotObjectPopup.push($(this).parent()[0]);
+														}
+													}
+													//End Save Scrollable Links
+											}
+										})
+									})
+									n_hot = n_hot + 1;
+									if(isHotPotPopup) {
+										if( $('#link-popup-hotspot' + n_hot, ld).text() != "")
+											$(this).parent().children('array').empty().append( hotpotObjectPopup, $( $('#link-popup-hotspot' + n_hot, ld).text() ) );
+										else
+										{
+											$(this).parent().children('array').empty().append(hotpotObjectPopup);
+										}
+									} else {
+										if( $('#link-popup-hotspot' + n_hot, ld).text() != "")
+											$(this).parent().children('array').empty().append( $( $('#link-popup-hotspot' + n_hot, ld).text() ) );
+									}
+								}
+								//End Save Scrollable Links
+								
+								hotpotObject.push($(this).parent()[0]);
+							}							
+					}
+				} );
+				//if (isHotPot) {
+					//hotpotObject.push($(this)[0]);
+				//}
+			} );
+			
+		if(isHotPot) {
+			$(dict_array_xml).empty().append( hotpotObject, $( $('#links', ld).text() ));
+		} else {
+			$(dict_array_xml).empty().append( $( $('#links', ld).text() ) );
+		}
 		$.ajax( {
 			url: $('#filename', ld).text(),
 			type: 'PUT',
@@ -449,14 +689,14 @@
 		d.writeln( '		bottom: 0; border: none; border-top: 1px solid #666;' );
 		d.writeln( '		background-color: white; opacity: .8;' );
 		d.writeln( '	}' );
-		d.writeln( '	#links {' );
+		d.writeln( '	#links, .scrollableLinks, .popupLinks {' );
 		d.writeln( '		padding: 6px;' );
 		d.writeln( '		border-width: 1px;' );
 		d.writeln( '		border-style: inset;' );
 		d.writeln( '		background-color: #eee;' );
 		d.writeln( '		margin-bottom: 1em;' );
 		d.writeln( '	}' );
-		d.writeln( '	#links div { margin: 6px; white-space: pre; }' );
+		d.writeln( '	#links div, .scrollableLinks div, .popupLinks div{ margin: 6px; white-space: pre; }' );
 		d.writeln( '	span { width: 150px; }' );
 		d.writeln( '</style>' );
 		d.writeln( '' );
@@ -482,28 +722,28 @@
 		}
 		d.writeln( '</div>' );
 		d.close();
-
+		
 		$('#links', d).on( {
-			mouseenter: function (e) {
-				$('#' + this.id).css( 'outline-width', '5px' );
-			},
-			mouseleave: function (e) {
-				$('#' + this.id).css( 'outline-width', '1px' );
-			},
-			dblclick: function (e) {
-				$(this).css( 'background-color', 'white' ).prop( 'contenteditable', true );
-				changed = true;
-			},
-			keydown: function (e) {
-				if ( e.which == 13 ) {
-					$(this).css( 'background-color', 'inherit' ).blur();
-					$(this).prop( 'contenteditable', false ).each( function () {
-						var m = $(this).text().match( /{{(\d+),(\d+)},{(\d+),(\d+)}}/ );
-						$('#' + this.id).css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
-					} );
-				}
+		mouseenter: function (e) {
+			$('#' + this.id).css( 'outline-width', '5px' );
+		},
+		mouseleave: function (e) {
+			$('#' + this.id).css( 'outline-width', '1px' );
+		},
+		dblclick: function (e) {
+			$(this).css( 'background-color', 'white' ).prop( 'contenteditable', true );
+			changed = true;
+		},
+		keydown: function (e) {
+			if ( e.which == 13 ) {
+				$(this).css( 'background-color', 'inherit' ).blur();
+				$(this).prop( 'contenteditable', false ).each( function () {
+					var m = $(this).text().match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+					$('#' + this.id).css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+				} );
 			}
-		}, 'div' );
+		}
+	}, 'div' );
 
 		$('#save', d).click( save_plist );
 
@@ -513,16 +753,243 @@
 	// OPEN INITIAL PAGE
 
 	$.ajax( {
-		url: 'Replica.plist'
+		url: masterPlist || 'Replica.plist'
 	} ).success( function (xml) {
 		$(xml).find('array').find('string').each( function (index, page) {
 			pages.push( page.textContent );
 		} );
+		console.log(reqURL);
 		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
-			pages[0].replace( /\d+$/, function (n) { return Number(n) } ) + '.jpg';
+			pages[0].replace( /\d+$/, 0) + '.jpg';
 		update_image();
 	} ).error( function () {
 		alert( 'No master plist found. Please put this file in the issue directory.')
 	} );
-
+	
+	//Event Click of Scrollable for create new links
+	function scrollableClick(e) {									
+		if ( linking ) {
+			var dims = '{{%s,%s},{%s,%s}}'.sprintf(
+				Math.round(linking.position().left), Math.round(linking.position().top),
+				Math.round(linking.width()), Math.round(linking.height())
+			);
+			var url = 'http://domain.tld';
+			if ( e.shiftKey ) url = '000';
+			$('#'+e.currentTarget.id+'', ld).append( $('<div id="link-' + n_links + '">').html( linkXML(dims, url) ) );
+			changed = true;
+			$('.link').removeClass('selected');
+			linking.removeClass().addClass('link selected').css( 'pointer-events', 'auto' );
+			$('#url').val( $(this).data('url') ).show();
+			linking = null;
+		} else {
+			linking = $('<div id="link-' + ++n_links + '" class="linking"></div>').css( {
+				left: mouseX + 1 - $('#'+e.currentTarget.id+'').position().left, top: mouseY- $('#'+e.currentTarget.id+'').position().top,
+				width: 0, height: 0
+			} );
+			$('#'+e.currentTarget.id+'').append( linking );
+		}
+	}
+	
+	//Event Click of Popup for show popup
+	function showPopUp(e){
+		$(".popup").hide();
+		$(this).next().show();
+		$(".popup-hotspot").hide();
+		$(".popup-" + e.currentTarget.id).show();		
+	}
+	
+	//Event Click of Popup for close popup
+	function closePopUp(e){
+		$(".popup").hide();		
+		$(".popup-hotspot").hide();
+	}
+	
+	//Event Click of Popup for create link of popup
+	function createLinkOfPopup(e){
+		if (e.target === this) {
+			if ( linking ) {
+				var dims = '{{%s,%s},{%s,%s}}'.sprintf(
+					Math.round(linking.position().left), Math.round(linking.position().top),
+					Math.round(linking.width()), Math.round(linking.height())
+				);
+				var url = 'http://domain.tld';
+				if ( e.shiftKey ) url = '000';
+				$('#link-' + e.currentTarget.id , ld).append( $('<div id="link-' + n_links + '">').html( linkXML(dims, url) ) );
+				changed = true;
+				$('.link').removeClass('selected');
+				linking.removeClass().addClass('link selected  popup-hotspot '+e.currentTarget.id+'').css( 'pointer-events', 'auto' );
+				$('#url').val( $(this).data('url') ).show();
+				linking = null;
+			} else {
+				linking = $('<div id="link-' + ++n_links + '" class="linking popup-hotspot '+e.currentTarget.id+'"></div>').css( {
+					left: mouseX + 1, top: mouseY,
+					width: 0, height: 0
+				} );
+				$(this).after( linking );
+			}
+		}
+	}
+	
+	//Display all popup hotspot
+	function displayPopupHotspot(hotspot, dimsClose, autoPopup, n_hotspot)
+	{	
+		hotspot.next().children().each(function(){
+			var dimChildren, urlChildren, dimScrollable;
+			var isHotpotChildren = false;
+			$(this).children().each(function(){
+				switch ( $(this).text() ) {
+					case 'view-type':
+						if($(this).next().text() != 'link'){
+							isHotpotChildren = true;
+						}
+						break;
+					case 'image-name':
+						var m = dimChildren.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+						var popup = $('<div id="popup-hotspot'+ n_hotspot + '" class="popup" />');
+						$('body').append(popup);						
+						popup.css( { left: m[1], top: m[2], width: m[3], height: m[4], position: 'absolute', background: encodeURI("url(" + imageDir + $(this).next().text()+")"), 'background-size': m[3]+' ' +m[4]} )
+							.bind('click', createLinkOfPopup);
+						
+						if(dimsClose != undefined)
+						{
+							m = dimsClose.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+							var close = $('<div id="close-' + n_hotspot + '" class="closeButton"></div>');
+							$('#popup-hotspot'+ n_hotspot).append(close);
+							close.css( { left: m[1], top: m[2], width: m[3], height: m[4], position : 'absolute' } )
+								.bind('click', closePopUp);
+						}
+						
+						if(autoPopup == 'false'){
+							popup.hide();
+						}
+						
+						break;
+					case 'final-coordinates':
+						dimChildren = $(this).next().text();
+						break;
+					case 'url':
+					case 'page-number':
+						urlChildren = $(this).next().text();
+						break;						
+						
+					//Get scrollable coordinates 
+					case 'content-coordinates':
+						dimScrollable = $(this).next().text();
+						break;
+					//End Get scrollable coordinates 
+					
+					//Get and Display Scrollable
+					case 'scroll-objects':
+						displayScrollable($(this),dimChildren, dimScrollable, n_hotspot)
+						break;
+						// End Get and Display Scrollable
+				}
+			});
+			if(!isHotpotChildren){
+				if(urlChildren != null)
+				{
+					$('#link-popup-hotspot' + n_hotspot, ld).append(
+						$('<div id="link-' + ++n_links + '"></div').html( linkXML( dimChildren, urlChildren ) )
+					);
+					var m = dimChildren.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+					if ( m ) {
+						var link = $('<div id="link-' + n_links + '" class="link linked popup-hotspot popup-hotspot'+ n_hotspot + '"></div>');
+						$('#popup-hotspot'+ n_hotspot).after(link);
+						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+						link.hide();
+					}
+				}
+				
+				if(autoPopup == 'true'){
+					link.show();
+				}
+			}
+		});
+	}
+	
+	//Display scrollable
+	function displayScrollable(scrollableNode, finalDim, dimsContent, num)
+	{
+		n_scrollable = n_scrollable + 1;
+		var m = dimsContent.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+		var finalM = finalDim.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+		var scrollable = $('<div id="scrollable' + n_scrollable + '" class="scrollable" />');
+		var scrollableOfPopup = "";
+		
+		if ( m ) {
+			if(num != ""){
+				$('#popup-hotspot' + num).append(scrollable);
+				scrollableOfPopup = "link-popup-hotspot" + num;
+			}
+			else
+			{
+				$('body').append(scrollable);
+			}
+			$('#links', ld).before('<h3>Scrollable' + num + '</h3><div id="scrollable' + n_scrollable + '" class="scrollableLinks '+scrollableOfPopup+'"></div>');								
+			scrollable.css( { left: finalM[1], top: finalM[2], width: m[3], height: m[4], position: 'absolute',  'padding-bottom': '30'})
+				.bind('click', scrollableClick);
+			
+			$('#scrollable' + n_scrollable + '', ld).on( objHandlerOnLinkEvent, 'div' );
+		}
+		scrollableNode.next().children().each(function(){
+			var dimChildren, urlChildren;
+			var isHotpotChildren = false;
+			$(this).children().each(function(){
+				switch ( $(this).text() ) {
+					case 'view-type':
+						if($(this).next().text() != 'link'){
+							isHotpotChildren = true;
+						}
+						break;
+					case 'image-name':
+							var m = dimChildren.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+							scrollable.css( {'background': encodeURI("url(" + imageDir + $(this).next().text()+")"), 'background-size' : m[3]+' '+m[4]});
+						break;
+					case 'final-coordinates':
+						dimChildren = $(this).next().text();
+						break;									
+					case 'url':
+					case 'page-number':
+						urlChildren = $(this).next().text();
+						break;
+				}
+			});
+			if(!isHotpotChildren){
+				if(urlChildren != null)
+				{
+					$('#scrollable' + n_scrollable + '', ld).append(
+						$('<div id="link-' + ++n_links + '"></div').html( linkXML( dimChildren, urlChildren ) )
+					);
+					var m = dimChildren.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+					if ( m ) {
+						var link = $('<div id="link-' + n_links + '" class="link linked"></div>');
+						$('#scrollable' + n_scrollable + '').append(link);
+						link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+					}
+				}
+			}
+		})
+	}
+	
+	var objHandlerOnLinkEvent = {
+		mouseenter: function (e) {
+			$('#' + this.id).css( 'outline-width', '5px' );
+		},
+		mouseleave: function (e) {
+			$('#' + this.id).css( 'outline-width', '1px' );
+		},
+		dblclick: function (e) {
+			$(this).css( 'background-color', 'white' ).prop( 'contenteditable', true );
+			changed = true;
+		},
+		keydown: function (e) {
+			if ( e.which == 13 ) {
+				$(this).css( 'background-color', 'inherit' ).blur();
+				$(this).prop( 'contenteditable', false ).each( function () {
+					var m = $(this).text().match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
+					$('#' + this.id).css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
+				} );
+			}
+		}
+	}
 </script>
