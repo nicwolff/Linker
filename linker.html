@@ -56,7 +56,7 @@
 		heigh: 40px;
 		margin: 0 24px;
 	}
-	
+
 	.hotspot {z-index: 10;background: #B0B4FF}
 	.closeButton{z-index:50}
 </style>
@@ -87,14 +87,14 @@
 	var lw = open_links_window();
 	var ld = lw.document;
 	self.focus();
-	
+
 	var n_scrollable = 0;
-	
+
 	var pages = [];
 	var mouseX = -1;
 	var mouseY = -1;
 	var linking;
-	var n_links = 0;	
+	var n_links = 0;
 	var changed;
 	var reqURL, masterPlist;
 	var pageOffset = 0;
@@ -347,7 +347,7 @@
 			dims, urlType, urlElementType, url, urlElementType
 		);
 	}
-	
+
 	function linkXMLSubPageNumber (url, subPageNumber) {
 		var urlType = 'url', urlElementType = 'string';
 		if ( ! url.match(/\D/) ) { urlType = 'page-number'; urlElementType = 'integer'; }
@@ -368,7 +368,7 @@
 	function update_image () {
 		$('#notification').text('');
 		localStorage.setItem( reqURL + '.page_filename', filename );
-		
+
 		$('#background').prop( 'src', encodeURI(imageDir + filename) ).width(768);
 
 		setTimeout( function () {
@@ -382,15 +382,15 @@
 				window.resizeTo( window_width, window.screen.availHeight );
 			}, 50 );
 		}, 50 );
-		
+
 		//Remove all scrollable at the root window
 		$('.scrollable').remove();
-		
+
 		//Remove all popup at the root window
 		$(".hotspot").remove();
 		$(".popup").remove();
 		$(".popup-hotspot").remove();
-		
+
 		$('.link').remove();
 		$('#upbox').text( filename );
 		$('.nav').prop('disabled', false);
@@ -404,22 +404,22 @@
 	function update_plist (filename) {
 		if ( reqURL && changed ) { save_plist(); changed = false; }
 		$('#links', ld).empty();
-		
+
 		//Remove all scrollable links at the popup window
 		$('.scrollableLinks ', ld).remove();
-		
+
 		//Remove all popup links at the popup window
 		$('.popupLinks', ld).remove();
-		
+
 		//Remove all header of links at the popup window
 		$('h3', ld).remove();
-		
+
 		//number of hotspot
-		var n_hotspot = 0; 
-		
+		var n_hotspot = 0;
+
 		//number of scrollable
-		
-		
+
+
 		var plistname = pages[filename.match( /(\d+)\.jpg/ )[1] - 1 + pageOffset] + '.plist';
 		$('#filename', ld).text( plistname );
 		$.ajax( {
@@ -428,29 +428,29 @@
 			dataType: 'xml'
 		} ).success( function (xml) {
 			n_links = 0;
-			plist_xml = xml;			
-			
+			plist_xml = xml;
+
 			//dict_array_xml = $(xml).find('array');
 			dict_array_xml = $('plist > dict > array', xml);
 			dict_array_xml.children().each( function () {
 				var dims, url;
 				var subPageNumber = '';
-				
+
 				//Content coordinates
 				var dimsContent;
-				
-				//Hotspot's Variable 
+
+				//Hotspot's Variable
 				var autoPopup = 'false'; //check autoPopup of hotspot is true/false
-				var imageName; //Get image name 
+				var imageName; //Get image name
 				var dimsClose; //Get coordinates of the close button
-				
+
 				var isHotpot = false;
 				$(this).children().each( function () {
 					switch ( $(this).text() ) {
 						case 'sub-page-number':
 							subPageNumber = $(this).next().text();
 							break;
-					
+
 						case 'view-type':
 							if($(this).next().text() != 'link'){
 								isHotpot = true;
@@ -460,27 +460,27 @@
 						case 'final-coordinates':
 							dims = $(this).next().text();
 							break;
-							
-						//Get content coordinates 
+
+						//Get content coordinates
 						case 'content-coordinates':
 							dimsContent = $(this).next().text();
 							break;
-						
+
 						case 'url':
 						case 'page-number':
 							url = $(this).next().text();
 							break;
-						
+
 						//Check AutoPopup field
 						case 'auto-popup':
 							autoPopup = $(this).next()[0].nodeName;
 							break;
-						
+
 						//Get image name
 						case 'image-name':
 							imageName = $(this).next().text();
 							break;
-						
+
 						//Get coordinates of the close button
 						case 'close-button':
 							$(this).next().children().each(function(){
@@ -490,7 +490,7 @@
 								}
 							})
 							break;
-						
+
 						//Popup page
 						case 'reveals':
 							var m = dims.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
@@ -499,16 +499,16 @@
 							$('#links', ld).before('<h3>Hotspot '+ n_hotspot + '</h3>').before(
 								$('<div id="link-popup-hotspot'+ n_hotspot +'" class="popupLinks"></div').html("")
 							);
-							
+
 							$('body').append(hotspot);
 							hotspot.css( { left: m[1], top: m[2], width: m[3], height: m[4], position: 'absolute', opacity: '0.5' } )
 								.bind('click', showPopUp);
-								
+
 							$('#link-popup-hotspot'+ n_hotspot, ld).on( objHandlerOnLinkEvent, 'div' );
-								
-							displayPopupHotspot($(this), dimsClose, autoPopup, n_hotspot, imageDir);							
+
+							displayPopupHotspot($(this), dimsClose, autoPopup, n_hotspot, imageDir);
 							break;
-						
+
 						//Scrollable Page
 						case 'scroll-objects':
 							displayScrollable($(this), dims, dimsContent, "")
@@ -528,7 +528,7 @@
 							link.css( { left: m[1], top: m[2], width: m[3], height: m[4] } );
 						}
 					}
-					
+
 				}
 			} )
 		} ).error( function(x,e){
@@ -555,18 +555,18 @@
 		var isHotPot = false;
 		var n_hot = 0;
 		var n_saveScrollable = 0;
-		
-		
+
+
 		dict_array_xml.children().each( function () {
 				$(this).children().each( function () {
 					switch ( $(this).text() ) {
 						case 'view-type':
 							if($(this).next().text() != 'link'){
 								isHotPot = true;
-								
+
 								//Save Scrollable Links
 								if($(this).next().text() == 'scrollarea')
-								{	
+								{
 									var hotpotObjectScrollable = [];
 									var isHotPotScrollable = false;
 									 $(this).parent().children('array').children().each(function(){
@@ -588,24 +588,24 @@
 									}
 								}
 								//End Save Scrollable Links
-								
+
 								//Save PopUp Links
 								if($(this).next().text() == 'hotspot')
-								{	
+								{
 									var hotpotObjectPopup = [];
 									var isHotPotPopup = false;
 									$(this).parent().children('array').children().each(function(){
 										$(this).children().each( function () {
 											switch ( $(this).text() ) {
-												case 'view-type':													
+												case 'view-type':
 													if($(this).next().text() != 'link' && $(this).next().text() != 'scrollarea'){
 														isHotPotPopup = true;
 														hotpotObjectPopup.push($(this).parent()[0]);
 													}
-													
+
 													//Save Scrollable Links
 													if($(this).next().text() == 'scrollarea')
-													{	
+													{
 														var hotpotObjectScrollable = [];
 														var isHotPotScrollable = false;
 														 $(this).parent().children('array').children().each(function(){
@@ -646,16 +646,16 @@
 									}
 								}
 								//End Save Scrollable Links
-								
+
 								hotpotObject.push($(this).parent()[0]);
-							}							
+							}
 					}
 				} );
 				//if (isHotPot) {
 					//hotpotObject.push($(this)[0]);
 				//}
 			} );
-			
+
 		if(isHotPot) {
 			$(dict_array_xml).empty().append( hotpotObject, $( $('#links', ld).text() ));
 		} else {
@@ -722,7 +722,7 @@
 		}
 		d.writeln( '</div>' );
 		d.close();
-		
+
 		$('#links', d).on( {
 		mouseenter: function (e) {
 			$('#' + this.id).css( 'outline-width', '5px' );
@@ -765,9 +765,9 @@
 	} ).error( function () {
 		alert( 'No master plist found. Please put this file in the issue directory.')
 	} );
-	
+
 	//Event Click of Scrollable for create new links
-	function scrollableClick(e) {									
+	function scrollableClick(e) {
 		if ( linking ) {
 			var dims = '{{%s,%s},{%s,%s}}'.sprintf(
 				Math.round(linking.position().left), Math.round(linking.position().top),
@@ -789,21 +789,21 @@
 			$('#'+e.currentTarget.id+'').append( linking );
 		}
 	}
-	
+
 	//Event Click of Popup for show popup
 	function showPopUp(e){
 		$(".popup").hide();
 		$(this).next().show();
 		$(".popup-hotspot").hide();
-		$(".popup-" + e.currentTarget.id).show();		
+		$(".popup-" + e.currentTarget.id).show();
 	}
-	
+
 	//Event Click of Popup for close popup
 	function closePopUp(e){
-		$(".popup").hide();		
+		$(".popup").hide();
 		$(".popup-hotspot").hide();
 	}
-	
+
 	//Event Click of Popup for create link of popup
 	function createLinkOfPopup(e){
 		if (e.target === this) {
@@ -829,10 +829,10 @@
 			}
 		}
 	}
-	
+
 	//Display all popup hotspot
 	function displayPopupHotspot(hotspot, dimsClose, autoPopup, n_hotspot)
-	{	
+	{
 		hotspot.next().children().each(function(){
 			var dimChildren, urlChildren, dimScrollable;
 			var isHotpotChildren = false;
@@ -846,10 +846,10 @@
 					case 'image-name':
 						var m = dimChildren.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
 						var popup = $('<div id="popup-hotspot'+ n_hotspot + '" class="popup" />');
-						$('body').append(popup);						
+						$('body').append(popup);
 						popup.css( { left: m[1], top: m[2], width: m[3], height: m[4], position: 'absolute', background: encodeURI("url(" + imageDir + $(this).next().text()+")"), 'background-size': m[3]+' ' +m[4]} )
 							.bind('click', createLinkOfPopup);
-						
+
 						if(dimsClose != undefined)
 						{
 							m = dimsClose.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
@@ -858,11 +858,11 @@
 							close.css( { left: m[1], top: m[2], width: m[3], height: m[4], position : 'absolute' } )
 								.bind('click', closePopUp);
 						}
-						
+
 						if(autoPopup == 'false'){
 							popup.hide();
 						}
-						
+
 						break;
 					case 'final-coordinates':
 						dimChildren = $(this).next().text();
@@ -870,14 +870,14 @@
 					case 'url':
 					case 'page-number':
 						urlChildren = $(this).next().text();
-						break;						
-						
-					//Get scrollable coordinates 
+						break;
+
+					//Get scrollable coordinates
 					case 'content-coordinates':
 						dimScrollable = $(this).next().text();
 						break;
-					//End Get scrollable coordinates 
-					
+					//End Get scrollable coordinates
+
 					//Get and Display Scrollable
 					case 'scroll-objects':
 						displayScrollable($(this),dimChildren, dimScrollable, n_hotspot)
@@ -899,14 +899,14 @@
 						link.hide();
 					}
 				}
-				
+
 				if(autoPopup == 'true'){
 					link.show();
 				}
 			}
 		});
 	}
-	
+
 	//Display scrollable
 	function displayScrollable(scrollableNode, finalDim, dimsContent, num)
 	{
@@ -915,7 +915,7 @@
 		var finalM = finalDim.match( /{{(\-*\d+),(\-*\d+)},{(\d+),(\d+)}}/ );
 		var scrollable = $('<div id="scrollable' + n_scrollable + '" class="scrollable" />');
 		var scrollableOfPopup = "";
-		
+
 		if ( m ) {
 			if(num != ""){
 				$('#popup-hotspot' + num).append(scrollable);
@@ -925,10 +925,10 @@
 			{
 				$('body').append(scrollable);
 			}
-			$('#links', ld).before('<h3>Scrollable' + num + '</h3><div id="scrollable' + n_scrollable + '" class="scrollableLinks '+scrollableOfPopup+'"></div>');								
+			$('#links', ld).before('<h3>Scrollable' + num + '</h3><div id="scrollable' + n_scrollable + '" class="scrollableLinks '+scrollableOfPopup+'"></div>');
 			scrollable.css( { left: finalM[1], top: finalM[2], width: m[3], height: m[4], position: 'absolute',  'padding-bottom': '30'})
 				.bind('click', scrollableClick);
-			
+
 			$('#scrollable' + n_scrollable + '', ld).on( objHandlerOnLinkEvent, 'div' );
 		}
 		scrollableNode.next().children().each(function(){
@@ -947,7 +947,7 @@
 						break;
 					case 'final-coordinates':
 						dimChildren = $(this).next().text();
-						break;									
+						break;
 					case 'url':
 					case 'page-number':
 						urlChildren = $(this).next().text();
@@ -970,7 +970,7 @@
 			}
 		})
 	}
-	
+
 	var objHandlerOnLinkEvent = {
 		mouseenter: function (e) {
 			$('#' + this.id).css( 'outline-width', '5px' );
