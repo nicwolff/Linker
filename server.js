@@ -4,6 +4,7 @@ var http = require('http'),
 	url = require('url'),
 
 	rootPath = process.argv[2],
+	port = process.argv[3] || 8124,
 
 	contentTypes = {
 		html:  'text/html',
@@ -127,6 +128,6 @@ http.createServer( function (request, response) {
 		response.writeHead( 405, 'Method %s not allowed on resource %s'.sprintf( method, resource ) );
 	  response.end();
 	}
-} ).listen(8124);
+} ).listen(port);
 
-console.log('Server running at http://127.0.0.1:8124/');
+console.log('Server running at http://127.0.0.1:%d/', port);
