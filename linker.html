@@ -365,22 +365,33 @@
 		);
 	}
 
+	var sizers = {
+		ROA: function (i) { i.width(768) },
+		CLX: function (i) { i.width(768) },
+		TCX: function (i) { i.width(768) },
+		HBZ: function (i) { i.width(768) },
+		VER: function (i) { i.width(768) },
+		RBK: function (i) { i.height(1004) },
+		GHK: function (i) { i.height(1004) },
+		SEV: function (i) { i.height(1004) },
+		ROA: function (i) { i.height(1004) },
+		CDB: function (i) { i.width(748) }
+	};
+
 	function update_image () {
 		$('#notification').text('');
 		localStorage.setItem( reqURL + '.page_filename', filename );
 
-		$('#background').prop( 'src', encodeURI(imageDir + filename) ).width(768);
+		$('#background').prop( 'src', encodeURI(imageDir + filename) );
+
+		var sizer = sizers[ filename.substr(0,3) ];
+		sizer($('#background'));
 
 		setTimeout( function () {
-			if ( $('#background').height() > 1004 ) {
-				$('#background').height(1004).width('auto');
-			}
-			setTimeout( function () {
-				$('#v-guide').height( $('#background').height() ).show();
-				$('#h-guide').width( $('#background').width() ).show();
-				var window_width = $('#background').width() + window.scrollBarWidth();
-				window.resizeTo( window_width, window.screen.availHeight );
-			}, 50 );
+			$('#v-guide').height( $('#background').height() ).show();
+			$('#h-guide').width( $('#background').width() ).show();
+			var window_width = $('#background').width() + window.scrollBarWidth();
+			window.resizeTo( window_width, window.screen.availHeight );
 		}, 50 );
 
 		//Remove all scrollable at the root window
