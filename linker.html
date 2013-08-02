@@ -187,6 +187,11 @@
 
 	var filename;
 
+	$('#upform').on( {
+		mouseenter: function () { $('#h-guide').hide() },
+		mouseleave: function () { $('#h-guide').show() }
+	} );
+
 	$('#upfile').change( function (e) {
 		filename = $('#upfile').val();
 		filename = filename.split('\\').pop();
