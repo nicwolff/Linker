@@ -64,7 +64,7 @@
 <title>Linker</title>
 <img id="background">
 <form id="upform">
-	<input id="url" class="text_input" placeholder="Enter URL or page number here">
+	<input type="text" id="url" placeholder="Enter URL or page number here">
 	<div id="upbox">Click or drop file here</div>
 	<input id="upfile" type="file">
 	<input type="submit" id="prev" class="nav" value="< Prev">
@@ -230,6 +230,8 @@
 
 	$(document).keydown( function (e) {
 
+		if ( $(document.activeElement).is(':text') ) return;
+
 		var distance = 1, moved;
 		if (e.altKey) distance = 10;
 
@@ -274,7 +276,6 @@
 			}
 			moved = true;
 		} else if (e.which == 8) { // Backspace - delete selected links
-			if ( $(document.activeElement).hasClass('text_input') ) return;
 			if ( $('.selected').length > 1 && ! confirm( 'Are you sure you want to delete those links?' ) ) {
 				return false;
 			}
