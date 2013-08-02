@@ -70,7 +70,6 @@
 	<input type="submit" id="prev" class="nav" value="< Prev">
 	<input type="submit" id="next" class="nav" value="Next >">
 	<input type="text" id="goToImg" style="width:40px;" placeholder="goto">
-	<input type="submit" id="clearCache" value="Refresh">
 	<label id="notification"></label>
 </form>
 <div id="v-guide" class="guide"></div>
@@ -214,12 +213,6 @@
 		return false;
 	} );
 
-    $('#clearCache').click( function (e) {
-        localStorage.setItem( reqURL + '.page_filename', '')
-        refresh();
-        return false;
-    } );
-
 	$('#goToImg').keydown( function (e) {
 		if ( e.which == 13 ) {
 			filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
@@ -289,6 +282,9 @@
 		} else if (e.which == 27) { // Escape key - cancel link drawing
 			if ( linking ) linking.remove();
 			linking = null;
+			return false;
+		} else if (e.which == 82 && e.shiftKey) { // "R" - clear stored page filename
+			localStorage.setItem( reqURL + '.page_filename', '' );
 			return false;
 		}
 
