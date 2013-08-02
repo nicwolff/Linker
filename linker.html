@@ -371,6 +371,8 @@
 		);
 	}
 
+	var bg = $('#background');
+
 	var sizers = {
 		ROA: function (i) { i.width(768) },
 		CLX: function (i) { i.width(768) },
@@ -384,21 +386,24 @@
 		CDB: function (i) { i.width(748) }
 	};
 
+	// Update guide lengths and image size label
+	bg.load( function () {
+		var bgHeight = bg.height(), bgWidth = bg.width();
+		$('#v-guide').height( bgHeight ).show();
+		$('#h-guide').width( bgWidth ).show();
+		$('#imgsize').html('H: %s<br>W: %s'.sprintf(bgHeight, bgWidth));
+		var window_width = bgWidth + window.scrollBarWidth();
+		window.resizeTo( window_width, window.screen.availHeight );
+	} );
+
 	function update_image () {
 		$('#notification').text('');
 		localStorage.setItem( reqURL + '.page_filename', filename );
 
-		$('#background').prop( 'src', encodeURI(imageDir + filename) );
+		bg.prop( 'src', encodeURI(imageDir + filename) );
 
 		var sizer = sizers[ filename.substr(0,3) ];
-		sizer($('#background'));
-
-		setTimeout( function () {
-			$('#v-guide').height( $('#background').height() ).show();
-			$('#h-guide').width( $('#background').width() ).show();
-			var window_width = $('#background').width() + window.scrollBarWidth();
-			window.resizeTo( window_width, window.screen.availHeight );
-		}, 50 );
+		sizer(bg);
 
 		//Remove all scrollable at the root window
 		$('.scrollable').remove();
