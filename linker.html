@@ -27,6 +27,7 @@
 		margin: 0; padding: 6px;
 		bottom: 0; border: none; border-top: 1px solid #666;
 		background-color: white; z-index: 10; opacity: .8;
+		cursor: default;
 	}
 	#upbox {
 		position: absolute;
@@ -37,7 +38,7 @@
 		background-color: #bbb;
 		font-size: 12px;
 	}
-	#upfile { opacity: 0; width: 275px; }
+	#upfile { opacity: 0; width: 265px; margin-right: 10px; }
 	#url {
 		display: none; float: right;
 		margin-right: 12px; width: 250px;
@@ -57,7 +58,16 @@
 		margin: 0 24px;
 		display: none;
 	}
-	#imgsize { position: absolute; left: 240px; font-size: 9px; float: left; }
+	#imgsize {
+		position: absolute;
+		float: left;
+		z-index: 20;
+		left: 240px;
+		font-size: 9px;
+		cursor: pointer;
+	}
+	input[type=submit] { cursor: pointer; }
+	input[type=file] { cursor: pointer; }
 
 	.hotspot {z-index: 10;background: #B0B4FF}
 	.closeButton{z-index:50}
@@ -406,6 +416,8 @@
 		var window_width = bgWidth + window.scrollBarWidth();
 		window.resizeTo( window_width, window.screen.availHeight );
 	} );
+
+	$('#imgsize').click( function () { } );
 
 	function update_image () {
 		$('#notification').text('');
