@@ -68,6 +68,15 @@
 	}
 	input[type=submit] { cursor: pointer; }
 	input[type=file] { cursor: pointer; }
+	#sizeform {
+		position: absolute;
+		display: none;
+		padding: 6px;
+		border: 1px solid #666;
+		background-color: white; opacity: .8;
+		font-size: 11px;
+	}
+	#othersize { text-align: right; }
 
 	.hotspot {z-index: 10;background: #B0B4FF}
 	.closeButton{z-index:50}
@@ -85,6 +94,11 @@
 	<input type="submit" id="next" class="nav" value=">">
 	<label id="notification"></label>
 </form>
+<div id="sizeform">
+	Force page image
+	<select name="dimension"><option>width</option><option>height</option></select>
+	to <input type="text" id="othersize" size="5" placeholder="pixels">px
+</div>
 <div id="v-guide" class="guide"></div>
 <div id="h-guide" class="guide"></div>
 
@@ -344,6 +358,15 @@
 		$('#imgsize').html('H: %s<br>W: %s'.sprintf(bgHeight, bgWidth));
 		var window_width = bgWidth + window.scrollBarWidth();
 		window.resizeTo( window_width, window.screen.availHeight );
+	} );
+
+	$('#imgsize').click( function () {
+		var pos = $(this).offset();
+		$('#sizeform').css( {
+			top: pos.top - $('#sizeform').top,
+			left: pos.left
+		} ).show();
+		$('#othersize').focus();
 	} );
 
 	// FUNCTIONS
