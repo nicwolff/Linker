@@ -843,21 +843,6 @@
 		return win;
 	}
 
-	// OPEN INITIAL PAGE
-
-	$.ajax( {
-		url: masterPlist || 'Replica.plist'
-	} ).success( function (xml) {
-		$(xml).find('array').find('string').each( function (index, page) {
-			pages.push( page.textContent );
-		} );
-		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
-			pages[0].replace( /\d+$/, 0) + '.jpg';
-		update_image();
-	} ).error( function () {
-		alert( 'No master plist found. Please put this file in the issue directory.')
-	} );
-
 	//Event Click of Scrollable for create new links
 	function scrollableClick(e) {
 		if ( linking ) {
@@ -1084,4 +1069,20 @@
 			}
 		}
 	}
+
+	// OPEN INITIAL PAGE
+
+	$.ajax( {
+		url: masterPlist || 'Replica.plist'
+	} ).success( function (xml) {
+		$(xml).find('array').find('string').each( function (index, page) {
+			pages.push( page.textContent );
+		} );
+		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
+			pages[0].replace( /\d+$/, 0) + '.jpg';
+		update_image();
+	} ).error( function () {
+		alert( 'No master plist found. Please put this file in the issue directory.')
+	} );
+
 </script>
