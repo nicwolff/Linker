@@ -66,14 +66,15 @@
 		font-size: 9px;
 		cursor: pointer;
 	}
+	#imgsize:hover { color: blue; }
 	input[type=submit] { cursor: pointer; }
 	input[type=file] { cursor: pointer; }
 	#sizeform {
-		position: absolute;
+		position: absolute; z-index: 20;
 		display: none;
 		padding: 6px;
 		border: 1px solid #666;
-		background-color: white; opacity: .8;
+		background-color: #eee;
 		font-size: 11px;
 	}
 	#othersize { text-align: right; }
@@ -96,7 +97,7 @@
 </form>
 <div id="sizeform">
 	Force page image
-	<select name="dimension"><option>width</option><option>height</option></select>
+	<select id="dimension"><option>width</option><option>height</option></select>
 	to <input type="text" id="othersize" size="5" placeholder="pixels">px
 </div>
 <div id="v-guide" class="guide"></div>
@@ -128,6 +129,8 @@
 	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
 	if ( ! reqURL ) reqURL = window.location;
 	var imageDir = masterPlist == 'Replica.plist' ? 'pages/' : 'JPEGS/';
+	var forceSizer;
+
 	// EVENTS
 
 	String.prototype.sprintf = function () {
@@ -351,6 +354,7 @@
 	var bg = $('#background');
 
 	// Update guide lengths and image size label when image has loaded
+
 	bg.load( function () {
 		var bgHeight = bg.height(), bgWidth = bg.width();
 		$('#v-guide').height( bgHeight ).show();
@@ -360,13 +364,35 @@
 		window.resizeTo( window_width, window.screen.availHeight );
 	} );
 
+	// Show and handle image-size dialog
+
 	$('#imgsize').click( function () {
-		var pos = $(this).offset();
-		$('#sizeform').css( {
-			top: pos.top - $('#sizeform').top,
-			left: pos.left
-		} ).show();
+		var l = $(this).offset().left;
+		var t = $('#upform').offset().top;
+		$('#sizeform').css( { top: t - 50, left: l } ).show();
 		$('#othersize').focus();
+	} );
+
+	$('#othersize').keydown( function (e) {
+		if (e.which == 13) { // Return key
+			var size = $(this).blur().val();
+			var dimension = $('#dimension').val();
+			$('#sizeform').hide();
+			forceSizer = function (i) {
+				var dims = {
+					height: size * i.height() / i.width(),
+					width: size * i.width() / i.height()
+				};
+				dims[dimension] = size;
+				i.css( dims );
+			};
+			update_image();
+			bg.load();
+			return false;
+		} else if (e.which == 27) { // Escape key
+			$('#sizeform').hide();
+			return false;
+		}
 	} );
 
 	// FUNCTIONS
@@ -444,10 +470,10 @@
 		$('#notification').text('');
 		localStorage.setItem( reqURL + '.page_filename', filename );
 
-		bg.prop( 'src', encodeURI(imageDir + filename) );
-
-		var sizer = sizers[ filename.substr(0,3) ];
+		var sizer = forceSizer || sizers[ filename.substr(0,3) ];
 		sizer(bg);
+
+		bg.prop( 'src', encodeURI(imageDir + filename) );
 
 		//Remove all scrollable at the root window
 		$('.scrollable').remove();
