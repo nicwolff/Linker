@@ -27,6 +27,7 @@
 		margin: 0; padding: 6px;
 		bottom: 0; border: none; border-top: 1px solid #666;
 		background-color: white; z-index: 10; opacity: .8;
+		cursor: default;
 	}
 	#upbox {
 		position: absolute;
@@ -37,10 +38,10 @@
 		background-color: #bbb;
 		font-size: 12px;
 	}
-	#upfile { opacity: 0; }
+	#upfile { opacity: 0; width: 265px; margin-right: 10px; }
 	#url {
 		display: none; float: right;
-		margin-right: 20px; width: 250px;
+		margin-right: 12px; width: 250px;
 	}
 	.guide {
 		position: absolute; background-color: #666;
@@ -53,9 +54,30 @@
 		background-color: yellow;
 		outline: 1px solid red;
 		width: 400px;
-		heigh: 40px;
+		height: 40px;
 		margin: 0 24px;
+		display: none;
 	}
+	#imgsize {
+		position: absolute;
+		float: left;
+		z-index: 20;
+		left: 240px;
+		font-size: 9px;
+		cursor: pointer;
+	}
+	#imgsize:hover { color: blue; }
+	input[type=submit] { cursor: pointer; }
+	input[type=file] { cursor: pointer; }
+	#sizeform {
+		position: absolute; z-index: 20;
+		display: none;
+		padding: 6px;
+		border: 1px solid #666;
+		background-color: #eee;
+		font-size: 11px;
+	}
+	#othersize { text-align: right; }
 
 	.hotspot {z-index: 10;background: #B0B4FF}
 	.closeButton{z-index:50}
@@ -64,15 +86,20 @@
 <title>Linker</title>
 <img id="background">
 <form id="upform">
-	<input id="url" class="text_input" placeholder="Enter URL or page number here">
+	<input type="text" id="url" placeholder="Enter URL or page number here">
 	<div id="upbox">Click or drop file here</div>
+	<div id="imgsize"></div>
 	<input id="upfile" type="file">
-	<input type="submit" id="prev" class="nav" value="< Prev">
-	<input type="submit" id="next" class="nav" value="Next >">
+	<input type="submit" id="prev" class="nav" value="&lt;">
 	<input type="text" id="goToImg" style="width:40px;" placeholder="goto">
-	<input type="submit" id="clearCache" value="Refresh">
+	<input type="submit" id="next" class="nav" value=">">
 	<label id="notification"></label>
 </form>
+<div id="sizeform">
+	Force page image
+	<select id="dimension"><option>width</option><option>height</option></select>
+	to <input type="text" id="othersize" size="5" placeholder="pixels">px
+</div>
 <div id="v-guide" class="guide"></div>
 <div id="h-guide" class="guide"></div>
 
@@ -102,6 +129,8 @@
 	if ( masterPlist == 'Replica.plist' ) pageOffset = 1;
 	if ( ! reqURL ) reqURL = window.location;
 	var imageDir = masterPlist == 'Replica.plist' ? 'pages/' : 'JPEGS/';
+	var forceSizer;
+
 	// EVENTS
 
 	String.prototype.sprintf = function () {
@@ -187,6 +216,11 @@
 
 	var filename;
 
+	$('#upform').on( {
+		mouseenter: function () { $('#h-guide').hide() },
+		mouseleave: function () { $('#h-guide').show() }
+	} );
+
 	$('#upfile').change( function (e) {
 		filename = $('#upfile').val();
 		filename = filename.split('\\').pop();
@@ -209,21 +243,17 @@
 		return false;
 	} );
 
-    $('#clearCache').click( function (e) {
-        localStorage.setItem( reqURL + '.page_filename', '')
-        refresh();
-        return false;
-    } );
-
-    $('#goToImg').keydown( function (e) {
-        if ( e.which == 13 ) {
-            filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
-            update_image();
-            return false;
-        }
-    } );
+	$('#goToImg').keydown( function (e) {
+		if ( e.which == 13 ) {
+			filename = filename.replace( /\d+\.jpg/, $('#goToImg').val() + '.jpg' );
+			update_image();
+			return false;
+		}
+	} );
 
 	$(document).keydown( function (e) {
+
+		if ( $(document.activeElement).is(':text') ) return;
 
 		var distance = 1, moved;
 		if (e.altKey) distance = 10;
@@ -269,7 +299,6 @@
 			}
 			moved = true;
 		} else if (e.which == 8) { // Backspace - delete selected links
-			if ( $(document.activeElement).hasClass('text_input') ) return;
 			if ( $('.selected').length > 1 && ! confirm( 'Are you sure you want to delete those links?' ) ) {
 				return false;
 			}
@@ -283,6 +312,9 @@
 		} else if (e.which == 27) { // Escape key - cancel link drawing
 			if ( linking ) linking.remove();
 			linking = null;
+			return false;
+		} else if (e.which == 82 && e.shiftKey) { // "R" - clear stored page filename
+			localStorage.setItem( reqURL + '.page_filename', '' );
 			return false;
 		}
 
@@ -315,6 +347,50 @@
 			$(this).blur();
 			e.preventDefault();
 			changed = true;
+			return false;
+		}
+	} );
+
+	var bg = $('#background');
+
+	// Update guide lengths and image size label when image has loaded
+
+	bg.load( function () {
+		var bgHeight = bg.height(), bgWidth = bg.width();
+		$('#v-guide').height( bgHeight ).show();
+		$('#h-guide').width( bgWidth ).show();
+		$('#imgsize').html('H: %s<br>W: %s'.sprintf(bgHeight, bgWidth));
+		var window_width = bgWidth + window.scrollBarWidth();
+		window.resizeTo( window_width, window.screen.availHeight );
+	} );
+
+	// Show and handle image-size dialog
+
+	$('#imgsize').click( function () {
+		var l = $(this).offset().left;
+		var t = $('#upform').offset().top;
+		$('#sizeform').css( { top: t - 50, left: l } ).show();
+		$('#othersize').focus();
+	} );
+
+	$('#othersize').keydown( function (e) {
+		if (e.which == 13) { // Return key
+			var size = $(this).blur().val();
+			var dimension = $('#dimension').val();
+			$('#sizeform').hide();
+			forceSizer = function (i) {
+				var dims = {
+					height: size * i.height() / i.width(),
+					width: size * i.width() / i.height()
+				};
+				dims[dimension] = size;
+				i.css( dims );
+			};
+			update_image();
+			bg.load();
+			return false;
+		} else if (e.which == 27) { // Escape key
+			$('#sizeform').hide();
 			return false;
 		}
 	} );
@@ -365,23 +441,39 @@
 		);
 	}
 
+	var sizers = {
+		ROA: function (i) { i.width(768) },
+		CLX: function (i) { i.width(768) },
+		TCX: function (i) { i.width(768) },
+		HBZ: function (i) { i.width(768) },
+		VER: function (i) { i.width(768) },
+		FNM: function (i) { i.width(768) },
+		HGV: function (i) { i.width(768) },
+		RBK: function (i) { i.height(1004) },
+		GHK: function (i) { i.height(1004) },
+		SEV: function (i) { i.height(1004) },
+		ROA: function (i) { i.height(1004) },
+		CSL: function (i) { i.height(1004) },
+		WDY: function (i) { i.height(1004) },
+		MCX: function (i) { i.height(1004) },
+		COS: function (i) { i.height(1004) },
+		EDC: function (i) { i.height(1004) },
+		ELM: function (i) { i.height(1004) },
+		ESQ: function (i) { i.height(1004) },
+		HBX: function (i) { i.height(1004) },
+		OPR: function (i) { i.height(1004) },
+		PMX: function (i) { i.height(1004) },
+		CDB: function (i) { i.width(748) }
+	};
+
 	function update_image () {
 		$('#notification').text('');
 		localStorage.setItem( reqURL + '.page_filename', filename );
 
-		$('#background').prop( 'src', encodeURI(imageDir + filename) ).width(768);
+		var sizer = forceSizer || sizers[ filename.substr(0,3) ];
+		sizer(bg);
 
-		setTimeout( function () {
-			if ( $('#background').height() > 1004 ) {
-				$('#background').height(1004).width('auto');
-			}
-			setTimeout( function () {
-				$('#v-guide').height( $('#background').height() ).show();
-				$('#h-guide').width( $('#background').width() ).show();
-				var window_width = $('#background').width() + window.scrollBarWidth();
-				window.resizeTo( window_width, window.screen.availHeight );
-			}, 50 );
-		}, 50 );
+		bg.prop( 'src', encodeURI(imageDir + filename) );
 
 		//Remove all scrollable at the root window
 		$('.scrollable').remove();
@@ -457,6 +549,7 @@
 								$('#notification').text('This is "' + $(this).next().text() + '" page.');
 							}
 							break;
+
 						case 'final-coordinates':
 							dims = $(this).next().text();
 							break;
@@ -750,22 +843,6 @@
 		return win;
 	}
 
-	// OPEN INITIAL PAGE
-
-	$.ajax( {
-		url: masterPlist || 'Replica.plist'
-	} ).success( function (xml) {
-		$(xml).find('array').find('string').each( function (index, page) {
-			pages.push( page.textContent );
-		} );
-		console.log(reqURL);
-		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
-			pages[0].replace( /\d+$/, 0) + '.jpg';
-		update_image();
-	} ).error( function () {
-		alert( 'No master plist found. Please put this file in the issue directory.')
-	} );
-
 	//Event Click of Scrollable for create new links
 	function scrollableClick(e) {
 		if ( linking ) {
@@ -992,4 +1069,20 @@
 			}
 		}
 	}
+
+	// OPEN INITIAL PAGE
+
+	$.ajax( {
+		url: masterPlist || 'Replica.plist'
+	} ).success( function (xml) {
+		$(xml).find('array').find('string').each( function (index, page) {
+			pages.push( page.textContent );
+		} );
+		filename = localStorage.getItem( reqURL + '.page_filename' ) ||
+			pages[0].replace( /\d+$/, 0) + '.jpg';
+		update_image();
+	} ).error( function () {
+		alert( 'No master plist found. Please put this file in the issue directory.')
+	} );
+
 </script>

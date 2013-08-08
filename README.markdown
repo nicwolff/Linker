@@ -9,9 +9,18 @@ Or, run the server with
 
 and visit http://localhost:8124/
 
+Changes
+-------
 
+### Version 13080800, 8 Aug 2013
 
->Copyright (c) 2012 Nic Wolff
+* Autosense page image size based on title code in filename
+* Add indicator of page image size to toolbar
+* Override page image size by clicking on indicator
+* Clean up toolbar and move Refresh to "R" hotkey
+* server.js takes listen port as optional second parameter
+
+>Copyright (c) 2013 Nic Wolff
 
 >Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
