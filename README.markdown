@@ -3,11 +3,11 @@ Linker
 
 Put the linker.html file in the issue directory with the plist files and open it in your browser.
 
-Or, run the server with
+Or, to be able to save your plist changes back to disk, run the server with
 
-    node server.js <path to directory containing issue directories>
+    node server.js <path> [<port>]
 
-and visit http://localhost:8124/
+where <path> is the directory containing the issue directories, and the optional <port> is the port to listen on, which defaults to 8124. Then visit `http://localhost:8124/` (or whatever port you chose) with your browser.
 
 Changes
 -------
@@ -19,6 +19,9 @@ Changes
 * Override page image size by clicking on indicator
 * Clean up toolbar and move Refresh to "R" hotkey
 * server.js takes listen port as optional second parameter
+
+Notices
+-------
 
 >Copyright (c) 2013 Nic Wolff
 
